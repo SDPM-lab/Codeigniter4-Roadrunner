@@ -1,0 +1,28 @@
+http:
+  address:         0.0.0.0:8088
+  workers:
+    command:  "php psr-worker.php"
+    # pool:
+    #   numWorkers: 50
+    #   maxJobs:  10
+
+static:
+  enable:  true
+  dir:   "public"
+  forbid: [".php", ".htaccess"]
+
+reload:
+  # refresh interval (default 1s)
+  interval: 1s
+
+  # file extensions to watch, defaults to [.php]
+  patterns: [".php"]
+
+  # list of services to watch
+  services:
+    http:
+      # list of dirs, "" root
+      dirs: [""]
+
+      # include sub directories
+      recursive: true

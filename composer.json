@@ -1,0 +1,30 @@
+{
+    "name": "SDPMlab/Codeigniter4-Roadrunner",
+    "description": "Make Codeigniter4 work on Roadrunner Server.",
+    "keywords": [
+		"codeigniter",
+		"codeigniter4",
+		"Roadrunner"
+	],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SDPM-lab",
+            "homepage": "https://github.com/SDPM-lab"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php" : "^7.2",
+        "codeigniter4/framework": "^4",
+        "spiral/roadrunner": "1.8.1",
+        "spiral/dumper": "^1.1",
+        "monken/cli-create" : "^0.3"
+    },
+    "autoload": {
+		"psr-4": {
+			"SDPM-lab\\Ci4Roadrunner": "src/"
+		}
+	}
+}
