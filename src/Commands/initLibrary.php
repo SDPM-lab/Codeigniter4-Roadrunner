@@ -17,9 +17,9 @@ class InitLibrary extends BaseCommand
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $word = "&&";
         }else{
-            $word = ";";
+            $word = ";.";
         }
-        $init = popen("cd ".ROOTPATH."{$word}./vendor/bin/rr get", 'r');
+        $init = popen("cd ".ROOTPATH."{$word}/vendor/bin/rr get", 'r');
         pclose($init);
         CLI::write(
             CLI::color("\nCopy Codeigniter4 Roadrunner file ......\n","blue")
