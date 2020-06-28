@@ -1,5 +1,5 @@
 {
-    "name": "SDPMlab/Codeigniter4-Roadrunner",
+    "name": "sdpmlab/codeigniter4-roadrunner",
     "description": "Make Codeigniter4 work on Roadrunner Server.",
     "keywords": [
 		"codeigniter",
@@ -24,7 +24,7 @@
     },
     "autoload": {
 		"psr-4": {
-			"SDPM-lab\\Ci4Roadrunner": "src/"
+			"SDPMlab\\Ci4Roadrunner": "src/"
 		}
 	}
 }
