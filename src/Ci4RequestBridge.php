@@ -56,10 +56,17 @@ class Ci4RequestBridge
 
     private function setParams(){
         $this->_cRequest->setGlobal("get",$this->_rRequest->getQueryParams());
-        if($this->_rRequest->getMethod() == "post"){
+        if($this->_rRequest->getMethod() == "POST"){
             $this->_cRequest->setGlobal("post",$this->_rRequest->getParsedBody());
         }
+        $_COOKIE = [];
         $this->_cRequest->setGlobal("cookie",$this->_rRequest->getCookieParams());
+        foreach ($this->_rRequest->getCookieParams() as $key => $value) {
+            $_COOKIE[$key] = $value;
+        }
+        if(isset($_COOKIE[config(App::class)->sessionCookieName])){
+            session_id($_COOKIE[config(App::class)->sessionCookieName]);
+        }
         $this->_cRequest->setGlobal("server",$this->_rRequest->getServerParams());    
     }
 

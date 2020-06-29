@@ -6,6 +6,7 @@
 ini_set('display_errors', 'stderr');
 require 'vendor/autoload.php';
 
+use CodeIgniter\CodeIgniter;
 use Spiral\Debug;
 use Spiral\Goridge;
 use Spiral\RoadRunner;
@@ -37,12 +38,11 @@ $dumper->setRenderer(Debug\Dumper::ERROR_LOG, new Debug\Renderer\ConsoleRenderer
 
 while ($req = $psr7->acceptRequest()) {
     try {
-        $requestBridge = new Ci4RequestBridge($req,$dumper);
+        $requestBridge = new Ci4RequestBridge($req);
         $ci4Req = $requestBridge->getRequest();
         $app->setRequest($ci4Req);
-        //$dumper->dump($requestBridge, Debug\Dumper::ERROR_LOG);
         $ci4Response = $app->run();
-        $response = new Ci4ResponseBridge($ci4Response);
+        $response = new Ci4ResponseBridge($ci4Response,$req);
         //傳遞處理結果
         $psr7->respond($response);
         //初始化 CI4 以及 PHP 輸出輸入內容
@@ -50,7 +50,7 @@ while ($req = $psr7->acceptRequest()) {
         fwrite($input, "");
         fclose($input);
         ob_end_clean();
-        CodeIgniter\Services::reset(true);
+        \CodeIgniter\Services::reset(true);
         $appConfig = config(\Config\App::class);
         $app       = new \CodeIgniter\CodeIgniter($appConfig);
         $app->initialize();
