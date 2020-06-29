@@ -31,7 +31,7 @@ php spark ciroad:init
 Run the command in the root directory of the project:
 1. Windows
   ```
-  ./rr.exe serve -v -d
+  rr.exe serve -v -d
   ```
 2. MacOS/Linux
   ```
@@ -42,7 +42,7 @@ Run the command in the root directory of the project:
 The server settings are all in the project root directory ".rr.yaml". The default file will look like this:
 ```
 http:
-  address:         0.0.0.0:80
+  address:         0.0.0.0:8080
   workers:
     command:  "php psr-worker.php"
     # pool:
