@@ -8,7 +8,7 @@
 
 Make Codeigniter4 work on Roadrunner Server.
 
-> This library is currently under development, and its functions are not yet stable. Please do not use it in a production environment.
+> This library is currently under development, and its functions are not yet stable. Do not use it in production environment.
 
 ## Install
 
@@ -19,7 +19,7 @@ Make Codeigniter4 work on Roadrunner Server.
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v0.0.2-alpha"
+composer require sdpmlab/codeigniter4-roadrunner "v0.0.3-alpha"
 ```
 Initialize Roadrunner and files using built-in commands in the library
 
@@ -28,12 +28,16 @@ php spark ciroad:init
 ```
 
 ## Run
-Run the command in the root directory of the project:
-1. Windows
+Run the command in the root directory of your project:
+1. Use Codeigniter4 spark command
+  ```
+  php spark ciroad:start
+  ```
+2. Use Roadrunner command in Windows
   ```
   rr.exe serve -v -d
   ```
-2. MacOS/Linux
+3. Use Roadrunner command in MacOS/Linux
   ```
   ./rr serve -v -d
   ```

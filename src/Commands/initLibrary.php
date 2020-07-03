@@ -15,11 +15,11 @@ class InitLibrary extends BaseCommand
             CLI::color("Initializing Roadrunner Server binary ......\n","blue")
         );
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $word = "&&";
+            $command = "&&\\vendor\\bin\\rr get";
         }else{
-            $word = ";.";
+            $command = ";./vendor/bin/rr get";
         }
-        $init = popen("cd ".ROOTPATH."{$word}/vendor/bin/rr get", 'r');
+        $init = popen("cd ".ROOTPATH.$command, 'r');
         pclose($init);
         CLI::write(
             CLI::color("\nCopy Codeigniter4 Roadrunner file ......\n","blue")
