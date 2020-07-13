@@ -144,15 +144,16 @@ class Exceptions
 			$this->response->setStatusCode($statusCode);
 			$header = "HTTP/{$this->request->getProtocolVersion()} {$this->response->getStatusCode()} {$this->response->getReason()}";
 			header($header, true, $statusCode);
-
-			if (strpos($this->request->getHeaderLine('accept'), 'text/html') === false)
-			{
-				$this->respond(ENVIRONMENT === 'development' ? $this->collectVars($exception, $statusCode) : '', $statusCode)->send();
-			}
+			$dumper = new Debug\Dumper();
+			$dumper->dump($this->request->getHeaderLine('Accept'), Debug\Dumper::ERROR_LOG);
+			// if (strpos($this->request->getHeaderLine('accept'), 'text/html') === false)
+			// {
+			// 	$res = $this->respond(ENVIRONMENT === 'development' ? $this->collectVars($exception, $statusCode) : '', $statusCode)->send();
+			// }
 		}
 
 		$this->render($exception, $statusCode);
-
+		
 		// @codeCoverageIgnoreEnd
 	}
 
@@ -283,9 +284,13 @@ class Exceptions
 		ob_end_clean();
 		$this->response->setBody($buffer);
 		$response = new Ci4ResponseBridge($this->response->send(),$this->rRequest);
-        $this->client->respond($response);
+		//$this->client->getWorker()->error($buffer);
+		$this->client->respond($response);
+		//$this->killWorker();
+	}
+
+	public function killWorker(){
 		$this->client->getWorker()->stop();
-		exit;
 	}
 
 	//--------------------------------------------------------------------

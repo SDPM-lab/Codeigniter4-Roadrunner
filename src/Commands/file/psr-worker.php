@@ -12,6 +12,7 @@ use Spiral\Goridge;
 use Spiral\RoadRunner;
 use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
 use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
+use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
 if (phpversion() < $minPHPVersion)
@@ -36,8 +37,19 @@ $psr7 = new RoadRunner\PSR7Client($worker);
 $dumper = new Debug\Dumper();
 $dumper->setRenderer(Debug\Dumper::ERROR_LOG, new Debug\Renderer\ConsoleRenderer());
 
+
+$count = 0;
 while ($req = $psr7->acceptRequest()) {
+
+    //記憶體控制
+    if ($count++ > 500) {
+        $psr7->getWorker()->stop();
+        return;
+    }
+
+    //開始邏輯
     try {
+        $exception = new Exceptions($psr7,$req);
         $requestBridge = new Ci4RequestBridge($req);
         $ci4Req = $requestBridge->getRequest();
         $app->setRequest($ci4Req);
@@ -46,16 +58,41 @@ while ($req = $psr7->acceptRequest()) {
         //傳遞處理結果
         $psr7->respond($response);
         //初始化 CI4 以及 PHP 輸出輸入內容
-        $input = fopen("php://input", "w");
-        fwrite($input, "");
-        fclose($input);
-        ob_end_clean();
-        \CodeIgniter\Services::reset(true);
-        $appConfig = config(\Config\App::class);
-        $app       = new \CodeIgniter\CodeIgniter($appConfig);
-        $app->initialize();
-    } catch (\Throwable $e) {
+        init();
+    } catch (
+        \CodeIgniter\Router\Exceptions\RedirectException $e
+    ){
+        $logger = \CodeIgniter\Config\Services::logger();
+        $logger->info('REDIRECTED ROUTE at ' . $e->getMessage());
+        $ci4Response = service("response");
+        $ci4Response->redirect(base_url($e->getMessage()), 'auto', $e->getCode());
+        $ci4Response->pretend(false)->send();
+        $response = new Ci4ResponseBridge($ci4Response,$req);
+        $psr7->respond($response);
+        init();
+    } catch (
+        \CodeIgniter\Exceptions\PageNotFoundException $e
+    ){
+        $router = \CodeIgniter\Config\Services::router();
+        $ci4Response = \CodeIgniter\Config\Services::response();
+        $ci4Response->setStatusCode($e->getCode());
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound(ENVIRONMENT !== 'production' || is_cli() ? $e->getMessage() : '');
+    } catch (
+        \Throwable $e
+    ){
         $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
         $psr7->getWorker()->error((string)$e);
     }
-}  
+}
+
+function init()
+{
+    $input = fopen("php://input", "w");
+    fwrite($input, "");
+    fclose($input);
+    ob_end_clean();
+    \CodeIgniter\Config\Services::reset(true);
+    $appConfig = config(\Config\App::class);
+    $app       = new \CodeIgniter\CodeIgniter($appConfig);
+    $app->initialize();
+}

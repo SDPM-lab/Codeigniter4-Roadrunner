@@ -29,7 +29,7 @@ class InitLibrary extends BaseCommand
         }else{
             $word = "/";
         }
-        copy(dirname(__FILE__).$word."file".$word."psr-worker",ROOTPATH."psr-worker.php");
+        copy(dirname(__FILE__).$word."file".$word."psr-worker.php",ROOTPATH."psr-worker.php");
         copy(dirname(__FILE__).$word."file".$word.".rr.yaml",ROOTPATH.".rr.yaml");
         CLI::write(
             CLI::color("Initialization successful!\n", 'green')
