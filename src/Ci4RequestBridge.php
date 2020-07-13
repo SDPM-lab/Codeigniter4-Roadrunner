@@ -18,9 +18,10 @@ class Ci4RequestBridge
     public function __construct(ServerRequest $rRequest)
     {
         $this->_rRequest = $rRequest;
-        $dumper = new Debug\Dumper();
+        $this->dumper = new Debug\Dumper();
         $this->setFile();
         $body = $this->getBody();
+        $_SERVER['HTTP_USER_AGENT'] = $this->_rRequest->getHeaderLine("User-Agent");
         $this->_cRequest = new IncomingRequest(
             new \Config\App(),
             new URI(),
@@ -29,6 +30,7 @@ class Ci4RequestBridge
         );
         $this->_cRequest->uri = $this->getBridgeURI($this->_cRequest->uri);
         $this->setParams();
+        $this->setHeader();
     }
 
     private function setFile(){
@@ -68,6 +70,15 @@ class Ci4RequestBridge
             session_id($_COOKIE[config(App::class)->sessionCookieName]);
         }
         $this->_cRequest->setGlobal("server",$this->_rRequest->getServerParams());    
+    }
+
+    private function setHeader(){
+        $rHeader = $this->_rRequest->getHeaders();
+        foreach ($rHeader as $key => $datas) {
+            foreach ($datas as $values) {
+                $this->_cRequest->setHeader($key,$values);
+            }
+        }
     }
 
     private function getBridgeURI(URI $cURI){
