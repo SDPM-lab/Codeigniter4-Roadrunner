@@ -49,34 +49,28 @@ while ($req = $psr7->acceptRequest()) {
 
     //開始邏輯
     try {
-        $exception = new Exceptions($psr7,$req);
         $requestBridge = new Ci4RequestBridge($req);
         $ci4Req = $requestBridge->getRequest();
         $app->setRequest($ci4Req);
-        $ci4Response = $app->run();
+    } catch (
+        \Throwable $e
+    ){
+        $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
+        $psr7->getWorker()->error((string)$e);
+    }
+ 
+    //由 Exceptions 類別接管 Codeigniter Runtime 的錯誤處理
+    $exception = new Exceptions($psr7,$req);
+    $ci4Response = $app->run();
+
+    try {
+        $request = \CodeIgniter\Config\Services::request();
+        $dumper->dump($request, Debug\Dumper::ERROR_LOG);
         $response = new Ci4ResponseBridge($ci4Response,$req);
         //傳遞處理結果
         $psr7->respond($response);
         //初始化 CI4 以及 PHP 輸出輸入內容
         init();
-    } catch (
-        \CodeIgniter\Router\Exceptions\RedirectException $e
-    ){
-        $logger = \CodeIgniter\Config\Services::logger();
-        $logger->info('REDIRECTED ROUTE at ' . $e->getMessage());
-        $ci4Response = service("response");
-        $ci4Response->redirect(base_url($e->getMessage()), 'auto', $e->getCode());
-        $ci4Response->pretend(false)->send();
-        $response = new Ci4ResponseBridge($ci4Response,$req);
-        $psr7->respond($response);
-        init();
-    } catch (
-        \CodeIgniter\Exceptions\PageNotFoundException $e
-    ){
-        $router = \CodeIgniter\Config\Services::router();
-        $ci4Response = \CodeIgniter\Config\Services::response();
-        $ci4Response->setStatusCode($e->getCode());
-        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound(ENVIRONMENT !== 'production' || is_cli() ? $e->getMessage() : '');
     } catch (
         \Throwable $e
     ){
