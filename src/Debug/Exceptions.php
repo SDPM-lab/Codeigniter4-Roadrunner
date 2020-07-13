@@ -82,7 +82,6 @@ class Exceptions
 	 * @param \CodeIgniter\HTTP\Response        $response
 	 */
 	public function __construct(
-		\Spiral\RoadRunner\PSR7Client $client,
 		\Laminas\Diactoros\ServerRequest $rRequest
 	)
 	{
@@ -92,45 +91,14 @@ class Exceptions
 		$this->request  = \CodeIgniter\Config\Services::request();
 		$this->response = \CodeIgniter\Config\Services::response();
 		$this->rRequest = &$rRequest;
-		$this->client = &$client;
-		$this->initialize();
 	}
 
-	//--------------------------------------------------------------------
-
-	/**
-	 * Responsible for registering the error, exception and shutdown
-	 * handling of our application.
-	 */
-	public function initialize()
-	{
-		//Set the Exception Handler
-		set_exception_handler([$this, 'exceptionHandler']);
-
-		// Set the Error Handler
-		set_error_handler([$this, 'errorHandler']);
-
-		// Set the handler for shutdown to catch Parse errors
-		// Do we need this in PHP7?
-		register_shutdown_function([$this, 'shutdownHandler']);
-	}
-
-	//--------------------------------------------------------------------
-
-	/**
-	 * Catches any uncaught errors and exceptions, including most Fatal errors
-	 * (Yay PHP7!). Will log the error, display it if display_errors is on,
-	 * and fire an event that allows custom actions to be taken at this point.
-	 *
-	 * @param \Throwable $exception
-	 */
-	public function exceptionHandler(Throwable $exception)
+	public function exceptionHandler($exception)
 	{
 		// @codeCoverageIgnoreStart
 		$codes      = $this->determineCodes($exception);
 		$statusCode = $codes[0];
-		$exitCode   = $codes[1];
-
+		
 		// Log it
 		if ($this->config->log === true && ! in_array($statusCode, $this->config->ignoreCodes))
 		{
@@ -144,15 +112,14 @@ class Exceptions
 			$this->response->setStatusCode($statusCode);
 			$header = "HTTP/{$this->request->getProtocolVersion()} {$this->response->getStatusCode()} {$this->response->getReason()}";
 			header($header, true, $statusCode);
-			$dumper = new Debug\Dumper();
-			$dumper->dump($this->request->getHeaderLine('Accept'), Debug\Dumper::ERROR_LOG);
-			// if (strpos($this->request->getHeaderLine('accept'), 'text/html') === false)
-			// {
-			// 	$res = $this->respond(ENVIRONMENT === 'development' ? $this->collectVars($exception, $statusCode) : '', $statusCode)->send();
-			// }
+			if (strpos($this->rRequest->getHeaderLine('accept'), 'text/html') === false)
+			{
+				$res = $this->respond(ENVIRONMENT === 'development' ? $this->collectVars($exception, $statusCode) : '', $statusCode)->send();
+				return $res;
+			}
 		}
 
-		$this->render($exception, $statusCode);
+		return $this->render($exception, $statusCode);
 		
 		// @codeCoverageIgnoreEnd
 	}
@@ -181,29 +148,6 @@ class Exceptions
 
 		// Convert it to an exception and pass it along.
 		throw new ErrorException($message, 0, $severity, $file, $line);
-	}
-
-	//--------------------------------------------------------------------
-
-	/**
-	 * Checks to see if any errors have happened during shutdown that
-	 * need to be caught and handle them.
-	 */
-	public function shutdownHandler()
-	{
-		$error = error_get_last();
-
-		// If we've got an error that hasn't been displayed, then convert
-		// it to an Exception and use the Exception handler to display it
-		// to the user.
-		if (! is_null($error))
-		{
-			// Fatal Error?
-			if (in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]))
-			{
-				$this->exceptionHandler(new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']));
-			}
-		}
 	}
 
 	//--------------------------------------------------------------------
@@ -275,22 +219,14 @@ class Exceptions
 		{
 			ob_end_clean();
 		}
-		// $dumper = new Debug\Dumper();
-		// $dumper->dump("hi", Debug\Dumper::ERROR_LOG);
-
+		$this->request->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
 		ob_start();
 		include($path . $view);
 		$buffer = ob_get_contents();
-		ob_end_clean();
+		ob_end_clean();	
 		$this->response->setBody($buffer);
 		$response = new Ci4ResponseBridge($this->response->send(),$this->rRequest);
-		//$this->client->getWorker()->error($buffer);
-		$this->client->respond($response);
-		//$this->killWorker();
-	}
-
-	public function killWorker(){
-		$this->client->getWorker()->stop();
+		return $response;
 	}
 
 	//--------------------------------------------------------------------

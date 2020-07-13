@@ -21,6 +21,7 @@ class Ci4RequestBridge
         $this->dumper = new Debug\Dumper();
         $this->setFile();
         $body = $this->getBody();
+        $_SERVER['HTTP_USER_AGENT'] = $this->_rRequest->getHeaderLine("User-Agent");
         $this->_cRequest = new IncomingRequest(
             new \Config\App(),
             new URI(),

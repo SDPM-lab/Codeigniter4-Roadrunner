@@ -35,7 +35,6 @@ class Ci4UriBridge
             array_values($pathArr);
         }
         $path = "/".implode("/",$pathArr);
-        //$dumper->dump($pathArr, Debug\Dumper::ERROR_LOG);
         $this->_cURI->setPath($path);
     }
 
