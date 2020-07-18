@@ -114,8 +114,13 @@ class Exceptions
 			header($header, true, $statusCode);
 			if (strpos($this->rRequest->getHeaderLine('accept'), 'text/html') === false)
 			{
-				$res = $this->respond(ENVIRONMENT === 'development' ? $this->collectVars($exception, $statusCode) : '', $statusCode)->send();
-				return $res;
+				$msg = $this->collectVars($exception, $statusCode);
+				if(ENVIRONMENT === 'development'){
+					$this->response->setBody(json_encode($msg));
+				}
+				$this->response->setStatusCode($statusCode);
+				$response = new Ci4ResponseBridge($this->response->send(),$this->rRequest);
+				return $response;
 			}
 		}
 

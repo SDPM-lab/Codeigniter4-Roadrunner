@@ -13,6 +13,7 @@ use Spiral\RoadRunner;
 use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
 use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
+use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
 if (phpversion() < $minPHPVersion)
@@ -56,6 +57,21 @@ while ($req = $psr7->acceptRequest()) {
         $psr7->getWorker()->error((string)$e);
     }
 
+    //處理除錯工具列
+    try{
+        if(ENVIRONMENT === 'development'){
+            $toolbar = new Toolbar(config('Toolbar'),$ci4Req);
+            if($barResponse = $toolbar->respond()){
+                $psr7->respond($barResponse);
+                init();
+                continue;
+            }
+        }
+    } catch (\Throwable $e){
+        $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
+        $psr7->getWorker()->error((string)$e);
+    }
+
     //執行框架邏輯與錯誤處理
     try{
         $ci4Response = $app->run();
@@ -91,7 +107,9 @@ function init()
     $input = fopen("php://input", "w");
     fwrite($input, "");
     fclose($input);
-    ob_end_clean();
+    try {
+        ob_end_clean();
+    } catch (\Throwable $th) {}
     \CodeIgniter\Config\Services::reset(true);
     $appConfig = config(\Config\App::class);
     $app       = new \CodeIgniter\CodeIgniter($appConfig);
