@@ -34,6 +34,10 @@ class Ci4UriBridge
             unset($pathArr[1]);
             array_values($pathArr);
         }
+        if($pathArr[count($pathArr)-1] == ""){
+            unset($pathArr[count($pathArr)-1]);
+            array_values($pathArr);
+        }
         $path = "/".implode("/",$pathArr);
         $this->_cURI->setPath($path);
     }
