@@ -19,7 +19,7 @@ Make Codeigniter4 work on Roadrunner Server.
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta"
+composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta.1"
 ```
 Initialize Roadrunner and files using built-in commands in the library
 
