@@ -49,7 +49,6 @@ while ($req = $psr7->acceptRequest()) {
     try {
         $requestBridge = new Ci4RequestBridge($req);
         $ci4Req = $requestBridge->getRequest();
-        $app->setRequest($ci4Req);
     } catch (
         \Throwable $e
     ){
@@ -74,7 +73,7 @@ while ($req = $psr7->acceptRequest()) {
 
     //執行框架邏輯與錯誤處理
     try{
-        $ci4Response = $app->run();
+        $ci4Response = $app->setRequest($ci4Req)->run();
     }catch(
         \Throwable $e
     ){
