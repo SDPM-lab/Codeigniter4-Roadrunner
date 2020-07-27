@@ -48,6 +48,7 @@ class Ci4RequestBridge
     }
 
     private function setParams(){
+        \CodeIgniter\Config\Services::request()->setMethod($this->_rRequest->getMethod());
         \CodeIgniter\Config\Services::request()->setGlobal("get",$this->_rRequest->getQueryParams());
         if($this->_rRequest->getMethod() == "POST"){
             \CodeIgniter\Config\Services::request()->setGlobal("post",$this->_rRequest->getParsedBody());
