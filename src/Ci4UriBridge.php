@@ -1,25 +1,17 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Laminas\Diactoros\Uri as RURI;
-use Spiral\Debug;
-
-
 class Ci4UriBridge
 {
     private $_rURI;
-    private $dumper;
 
-    public function __construct(RURI $rURI)
+    public function __construct(\Laminas\Diactoros\Uri $rURI)
     {
         \CodeIgniter\Config\Services::uri(null,false);
         $this->_rURI = $rURI;
-        $this->dumper = new Debug\Dumper();
-        $this->transferAll();
-
     }
 
-    private function transferAll(){
+    public function setUri(){
         $this->transferPath();
         $this->transferQuery();
     }
@@ -48,10 +40,6 @@ class Ci4UriBridge
 
     private function transferQuery(){
         \CodeIgniter\Config\Services::uri()->setQuery($this->_rURI->getQuery());
-    }
-
-    public function getURI(){
-        return \CodeIgniter\Config\Services::uri();
     }
 
 }

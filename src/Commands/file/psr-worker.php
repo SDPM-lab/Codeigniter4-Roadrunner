@@ -6,14 +6,14 @@
 ini_set('display_errors', 'stderr');
 require 'vendor/autoload.php';
 
-use CodeIgniter\CodeIgniter;
-use Spiral\Debug;
 use Spiral\Goridge;
 use Spiral\RoadRunner;
 use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
 use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
+use SDPMlab\Ci4Roadrunner\Debug\Dumper;
+
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
 if (phpversion() < $minPHPVersion)
@@ -21,10 +21,18 @@ if (phpversion() < $minPHPVersion)
 	die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
 }
 unset($minPHPVersion);
-//強制使codeigniter 認為這是一般請求
-function is_cli(){
+
+/**
+ * Is CLI?
+ *
+ * Test to see if a request was made from the command line.
+ *
+ * @return boolean
+ */
+function is_cli(): bool{
     return false;
 }
+
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
 $pathsPath = FCPATH . 'app/Config/Paths.php';
 chdir(__DIR__);
@@ -35,8 +43,17 @@ $app = require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
 //worker setting
 $worker = new RoadRunner\Worker(new Goridge\StreamRelay(STDIN, STDOUT));
 $psr7 = new RoadRunner\PSR7Client($worker);
-$dumper = new Debug\Dumper();
-$dumper->setRenderer(Debug\Dumper::ERROR_LOG, new Debug\Renderer\ConsoleRenderer());
+
+ /**
+  * Dump given value into target output.
+  *
+  * @param mixed $value Variable
+  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
+  * @return string|null
+  */
+function dump($value,string $target = "ERROR_LOG") : ?string{
+    return Dumper::getInstance()->dump($value,$target);
+}
 
 $count = 0;
 while ($req = $psr7->acceptRequest()) {
@@ -52,7 +69,7 @@ while ($req = $psr7->acceptRequest()) {
     } catch (
         \Throwable $e
     ){
-        $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
+        dump((string)$e);
         $psr7->getWorker()->error((string)$e);
     }
 
@@ -67,7 +84,7 @@ while ($req = $psr7->acceptRequest()) {
             }
         }
     } catch (\Throwable $e){
-        $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
+        dump((string)$e);
         $psr7->getWorker()->error((string)$e);
     }
 
@@ -94,7 +111,7 @@ while ($req = $psr7->acceptRequest()) {
     } catch (
         \Throwable $e
     ){
-        $dumper->dump((string)$e, Debug\Dumper::ERROR_LOG);
+        dump((string)$e);
         $psr7->getWorker()->error((string)$e);
     }
 }

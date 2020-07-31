@@ -1,7 +1,6 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Spiral\Debug;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\Response\InjectContentTypeTrait;

@@ -3,16 +3,11 @@ namespace SDPMlab\Ci4Roadrunner\Debug;
 
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Exceptions\PageNotFoundException;
-use CodeIgniter\HTTP\IncomingRequest;
-use CodeIgniter\HTTP\Response;
 use Config\Paths;
 use function error_reporting;
 use ErrorException;
 use Throwable;
-use Spiral\Debug;
 use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
-use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
-use Spiral\RoadRunner;
 
 /**
  * Exceptions manager
@@ -224,7 +219,6 @@ class Exceptions
 		{
 			ob_end_clean();
 		}
-		$this->request->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
 		ob_start();
 		include($path . $view);
 		$buffer = ob_get_contents();

@@ -1,7 +1,6 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Spiral\Debug;
 use Laminas\Diactoros\ServerRequest;
 use SDPMlab\Ci4Roadrunner\Ci4UriBridge;
 use SDPMlab\Ci4Roadrunner\Ci4FileBridge;
@@ -9,16 +8,15 @@ use SDPMlab\Ci4Roadrunner\Ci4FileBridge;
 class Ci4RequestBridge 
 {
     private $_rRequest;
-    private $dumper;
 
     public function __construct(ServerRequest $rRequest)
     {
         $this->_rRequest = $rRequest;
-        $this->dumper = new Debug\Dumper();
         $this->setFile();
         $_SERVER['HTTP_USER_AGENT'] = $this->_rRequest->getHeaderLine("User-Agent");
         \CodeIgniter\Config\Services::request(new \Config\App(),false);
-        $this->setURI();
+        \CodeIgniter\Config\Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
+        $this->setUri();
         \CodeIgniter\Config\Services::request()->setBody($this->getBody());
         $this->setParams();
         $this->setHeader();
@@ -27,6 +25,7 @@ class Ci4RequestBridge
     private function setFile(){
         if(count($this->_rRequest->getUploadedFiles()) > 0){
             $fileBridge = new Ci4FileBridge($this->_rRequest->getUploadedFiles());
+            $fileBridge->setFile();
         }
     }
 
@@ -73,9 +72,9 @@ class Ci4RequestBridge
         }
     }
 
-    private function setURI(){
+    private function setUri(){
         $uriBridge = new Ci4UriBridge($this->_rRequest->getUri());
-        return $uriBridge->getURI();
+        $uriBridge->setUri();
     }
 
     public function getRequest(){
