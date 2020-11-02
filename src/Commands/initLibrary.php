@@ -19,7 +19,6 @@ class InitLibrary extends BaseCommand
         }else{
             $command = ";./vendor/bin/rr get";
         }
-        print("cd ".ROOTPATH.$command);
         $init = popen("cd ".ROOTPATH.$command, 'r');
         pclose($init);
         CLI::write(

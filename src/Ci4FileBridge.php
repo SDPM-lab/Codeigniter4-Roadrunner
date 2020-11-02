@@ -1,19 +1,19 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Spiral\Debug;
 use Laminas\Diactoros\UploadedFile;
 
 class Ci4FileBridge 
 {
     private $_rFiles;
-    private $dumper;
 
     public function __construct(array $rFiles)
     {
-        $this->dumper = new Debug\Dumper();
         $this->_rFiles = $rFiles;
         $_FILES = [];
+    }
+
+    public function setFile(){
         $this->handleFile();
     }
 

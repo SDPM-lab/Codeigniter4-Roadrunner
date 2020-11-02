@@ -1,22 +1,17 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use CodeIgniter\HTTP\URI as CURI;
-use Laminas\Diactoros\Uri as RURI;
-
 class Ci4UriBridge
 {
-    private $_cURI;
     private $_rURI;
 
-    public function __construct(RURI $rURI,CURI $cURI)
+    public function __construct(\Laminas\Diactoros\Uri $rURI)
     {
-        $this->_cURI = $cURI;
+        \CodeIgniter\Config\Services::uri(null,false);
         $this->_rURI = $rURI;
-        $this->transferAll();
     }
 
-    private function transferAll(){
+    public function setUri(){
         $this->transferPath();
         $this->transferQuery();
     }
@@ -25,7 +20,7 @@ class Ci4UriBridge
         $rPath = $this->_rURI->getPath();
 
         if($rPath == "/"){
-            $this->_cURI->setPath($rPath);
+            \CodeIgniter\Config\Services::uri()->setPath($rPath);
             return;
         }
 
@@ -39,15 +34,12 @@ class Ci4UriBridge
             array_values($pathArr);
         }
         $path = "/".implode("/",$pathArr);
-        $this->_cURI->setPath($path);
+        \CodeIgniter\Config\Services::uri()->setPath($path);
+
     }
 
     private function transferQuery(){
-        $this->_cURI->setQuery($this->_rURI->getQuery());
-    }
-
-    public function getURI(){
-        return $this->_cURI;
+        \CodeIgniter\Config\Services::uri()->setQuery($this->_rURI->getQuery());
     }
 
 }

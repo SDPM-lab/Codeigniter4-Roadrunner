@@ -1,34 +1,23 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Spiral\Debug;
 use Laminas\Diactoros\ServerRequest;
-use CodeIgniter\HTTP\IncomingRequest;
-use CodeIgniter\HTTP\UserAgent;
-use CodeIgniter\HTTP\URI;
 use SDPMlab\Ci4Roadrunner\Ci4UriBridge;
 use SDPMlab\Ci4Roadrunner\Ci4FileBridge;
 
 class Ci4RequestBridge 
 {
     private $_rRequest;
-    private $_cRequest;
-    private $dumper;
 
     public function __construct(ServerRequest $rRequest)
     {
         $this->_rRequest = $rRequest;
-        $this->dumper = new Debug\Dumper();
         $this->setFile();
-        $body = $this->getBody();
         $_SERVER['HTTP_USER_AGENT'] = $this->_rRequest->getHeaderLine("User-Agent");
-        $this->_cRequest = new IncomingRequest(
-            new \Config\App(),
-            new URI(),
-            $body,
-            new UserAgent()
-        );
-        $this->_cRequest->uri = $this->getBridgeURI($this->_cRequest->uri);
+        \CodeIgniter\Config\Services::request(new \Config\App(),false);
+        \CodeIgniter\Config\Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
+        $this->setUri();
+        \CodeIgniter\Config\Services::request()->setBody($this->getBody());
         $this->setParams();
         $this->setHeader();
     }
@@ -36,6 +25,7 @@ class Ci4RequestBridge
     private function setFile(){
         if(count($this->_rRequest->getUploadedFiles()) > 0){
             $fileBridge = new Ci4FileBridge($this->_rRequest->getUploadedFiles());
+            $fileBridge->setFile();
         }
     }
 
@@ -57,37 +47,38 @@ class Ci4RequestBridge
     }
 
     private function setParams(){
-        $this->_cRequest->setGlobal("get",$this->_rRequest->getQueryParams());
+        \CodeIgniter\Config\Services::request()->setMethod($this->_rRequest->getMethod());
+        \CodeIgniter\Config\Services::request()->setGlobal("get",$this->_rRequest->getQueryParams());
         if($this->_rRequest->getMethod() == "POST"){
-            $this->_cRequest->setGlobal("post",$this->_rRequest->getParsedBody());
+            \CodeIgniter\Config\Services::request()->setGlobal("post",$this->_rRequest->getParsedBody());
         }
         $_COOKIE = [];
-        $this->_cRequest->setGlobal("cookie",$this->_rRequest->getCookieParams());
+        \CodeIgniter\Config\Services::request()->setGlobal("cookie",$this->_rRequest->getCookieParams());
         foreach ($this->_rRequest->getCookieParams() as $key => $value) {
             $_COOKIE[$key] = $value;
         }
         if(isset($_COOKIE[config(App::class)->sessionCookieName])){
             session_id($_COOKIE[config(App::class)->sessionCookieName]);
         }
-        $this->_cRequest->setGlobal("server",$this->_rRequest->getServerParams());    
+        \CodeIgniter\Config\Services::request()->setGlobal("server",$this->_rRequest->getServerParams());    
     }
 
     private function setHeader(){
         $rHeader = $this->_rRequest->getHeaders();
         foreach ($rHeader as $key => $datas) {
             foreach ($datas as $values) {
-                $this->_cRequest->setHeader($key,$values);
+                \CodeIgniter\Config\Services::request()->setHeader($key,$values);
             }
         }
     }
 
-    private function getBridgeURI(URI $cURI){
-        $uriBridge = new Ci4UriBridge($this->_rRequest->getUri(),$cURI);
-        return $uriBridge->getURI();
+    private function setUri(){
+        $uriBridge = new Ci4UriBridge($this->_rRequest->getUri());
+        $uriBridge->setUri();
     }
 
     public function getRequest(){
-        return $this->_cRequest;
+        return \CodeIgniter\Config\Services::request();
     }
 
 }
