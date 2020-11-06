@@ -44,6 +44,11 @@ $app = require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
 $worker = new RoadRunner\Worker(new Goridge\StreamRelay(STDIN, STDOUT));
 $psr7 = new RoadRunner\PSR7Client($worker);
 
+/**
+ * PSR-File object global variable
+ */
+$psr7Files;
+
  /**
   * Dump given value into target output.
   *
@@ -130,4 +135,6 @@ function init()
     $appConfig = config(\Config\App::class);
     $app       = new \CodeIgniter\CodeIgniter($appConfig);
     $app->initialize();
+    $_FILES = [];
+    $GLOBALS["psr7Files"] = null;
 }
