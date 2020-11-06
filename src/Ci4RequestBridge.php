@@ -3,7 +3,7 @@ namespace SDPMlab\Ci4Roadrunner;
 
 use Laminas\Diactoros\ServerRequest;
 use SDPMlab\Ci4Roadrunner\Ci4UriBridge;
-use SDPMlab\Ci4Roadrunner\Ci4FileBridge;
+use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class Ci4RequestBridge 
 {
@@ -24,8 +24,7 @@ class Ci4RequestBridge
 
     private function setFile(){
         if(count($this->_rRequest->getUploadedFiles()) > 0){
-            $fileBridge = new Ci4FileBridge($this->_rRequest->getUploadedFiles());
-            $fileBridge->setFile();
+            UploadedFileBridge::getPsr7UploadedFiles($this->_rRequest->getUploadedFiles(),true);
         }
     }
 

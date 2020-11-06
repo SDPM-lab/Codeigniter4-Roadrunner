@@ -13,6 +13,7 @@ use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\Debug\Dumper;
+use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
@@ -43,11 +44,6 @@ $app = require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
 //worker setting
 $worker = new RoadRunner\Worker(new Goridge\StreamRelay(STDIN, STDOUT));
 $psr7 = new RoadRunner\PSR7Client($worker);
-
-/**
- * PSR-File object global variable
- */
-$psr7Files;
 
  /**
   * Dump given value into target output.
@@ -132,9 +128,8 @@ function init()
         ob_end_clean();
     } catch (\Throwable $th) {}
     \CodeIgniter\Config\Services::reset(true);
+    UploadedFileBridge::reset();
     $appConfig = config(\Config\App::class);
     $app       = new \CodeIgniter\CodeIgniter($appConfig);
     $app->initialize();
-    $_FILES = [];
-    $GLOBALS["psr7Files"] = null;
 }
