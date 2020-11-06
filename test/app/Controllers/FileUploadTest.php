@@ -1,6 +1,7 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
+use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
@@ -12,13 +13,16 @@ class FileUploadTest extends BaseController
 	 * form-data 
 	 */
 	public function fileUpload(){
-        $files = $this->request->getFiles();
+        $files = UploadedFileBridge::getPsr7UploadedFiles();
         $data = [];
 		foreach ($files as $file) {
-            $newFileName = $file->getRandomName();
+            $fileEx = array_pop(
+                explode('.', $file->getClientFilename())
+            );
+            $newFileName = uniqid(rand()).".".$fileEx;
             $newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-            rename($file->getTempName(),$newFilePath);
-            $data[$file->getClientName()] = md5_file($newFilePath);
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
         }
         return $this->respondCreated($data);	
 	}
@@ -27,47 +31,18 @@ class FileUploadTest extends BaseController
 	 * form-data multiple upload
 	 */
 	public function fileMultipleUpload(){
-		$files = $this->request->getFileMultiple("data");
+        $files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
         $data = [];
 		foreach ($files as $file) {
-            $newFileName = $file->getRandomName();
+            $fileEx = array_pop(
+                explode('.', $file->getClientFilename())
+            );
+            $newFileName = uniqid(rand()).".".$fileEx;
             $newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-            rename($file->getTempName(),$newFilePath);
-            $data[$file->getClientName()] = md5_file($newFilePath);
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
         }
         return $this->respondCreated($data);	
     }
-    
-    /**
-	 * form-data multiple upload by psr-7 file interface
-	 */
-    public function psr7FileUpload(){
-		$files = $GLOBALS["psr7Files"];
-		$data = [];
-		foreach ($files as  $file) {
-            $fileEx = explode('.', $file->getClientFilename());
-            $newFileName = uniqid(rand()).".".array_pop($fileEx);
-            $newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-            $file->moveTo($newFilePath);
-            $data[$file->getClientFilename()] = md5_file($newFilePath);
-        }
-        return $this->respondCreated($data);
-	}
-
-	/**
-	 * form-data multiple upload
-	 */
-	public function psr7FileMultipleUpload(){
-		$files = $GLOBALS["psr7Files"]["data"];
-        $data = [];
-		foreach ($files as  $file) {
-            $fileEx = explode('.', $file->getClientFilename());
-            $newFileName = uniqid(rand()).".".array_pop($fileEx);
-            $newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-            $file->moveTo($newFilePath);
-            $data[$file->getClientFilename()] = md5_file($newFilePath);
-        }
-        return $this->respondCreated($data);
-	}
 
 }
