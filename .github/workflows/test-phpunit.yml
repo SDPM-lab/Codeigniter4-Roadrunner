@@ -3,7 +3,7 @@ name: PHPUnit
 on:
   push:
     branches:
-      - test_case
+      - dev
     paths:
       - 'src/**'
       - 'test/**'
@@ -12,7 +12,7 @@ on:
       - .github/workflows/test-phpunit.yml
   pull_request:
     branches:
-      - testCase
+      - dev
     paths:
       - 'src/**'
       - 'test/**'
