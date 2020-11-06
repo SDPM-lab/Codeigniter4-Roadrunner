@@ -9,12 +9,14 @@ class Ci4FileBridge
 
     public function __construct(array $rFiles)
     {
-        $this->_rFiles = $rFiles;
-        $_FILES = [];
+        $this->_rFiles = &$rFiles;
     }
 
     public function setFile(){
-        $this->handleFile();
+        if(env("CIROAD_TEMP_UPLOAD")){
+            $this->handleFile();
+        }
+        $GLOBALS["psr7Files"] = &$this->_rFiles;
     }
 
     private function handleFile()
