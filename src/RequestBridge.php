@@ -2,10 +2,10 @@
 namespace SDPMlab\Ci4Roadrunner;
 
 use Laminas\Diactoros\ServerRequest;
-use SDPMlab\Ci4Roadrunner\Ci4UriBridge;
+use SDPMlab\Ci4Roadrunner\UriBridge;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
-class Ci4RequestBridge 
+class RequestBridge 
 {
     private $_rRequest;
 
@@ -72,7 +72,7 @@ class Ci4RequestBridge
     }
 
     private function setUri(){
-        $uriBridge = new Ci4UriBridge($this->_rRequest->getUri());
+        $uriBridge = new UriBridge($this->_rRequest->getUri());
         $uriBridge->setUri();
     }
 
