@@ -7,7 +7,7 @@ class Start extends BaseCommand
 {
     protected $group       = 'ciroad';
     protected $name        = 'ciroad:start';
-    protected $description = 'Strat Roadrunner server.';
+    protected $description = 'Strat RoadRunner server.';
     protected $usage = 'ciroad:start [Options]';
     protected $options = [
         '-d' => 'Run RoadRunner Server in debug mode to view all incoming requests',
@@ -30,7 +30,7 @@ class Start extends BaseCommand
             CLI::write($msg);
         }else{
             CLI::write($msg);
-            popen($command, 'r');    
+            exec($command);    
         }
     }
 
@@ -49,7 +49,7 @@ class Start extends BaseCommand
 
     protected function getMessage($isDev,$isBack): string
     {
-        $msg =  CLI::color("\nCodeigniter4 Roadrunner Server Starting.\n","green");
+        $msg =  CLI::color("\nCodeigniter4 RoadRunner Server Starting.\n","green");
         if($isDev) $msg .= CLI::color("Development mode.\n","yellow");
         if($isBack) $msg .= CLI::color("Bbackground mode.\n","yellow");
         return $msg;
