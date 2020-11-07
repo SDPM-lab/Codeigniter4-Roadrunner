@@ -123,7 +123,7 @@ class Home extends BaseController
 	public function sendHeader()
 	{
 		$this->response->setHeader("X-Set-Auth-Token",uniqid());
-        return $this->respond(["status"=>true]);
+		return $this->respond(["status"=>true]);
 	}
 
 }
@@ -167,9 +167,9 @@ use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
-    use ResponseTrait;
+	use ResponseTrait;
 
-    protected $format = "json";
+	protected $format = "json";
 	/**
 	 * form-data 
 	 */
@@ -258,7 +258,7 @@ function dump($value,string $target = "ERROR_LOG") : ?string;
     $ php spark ciroad:stop
     ```
 
-### ciraod:reset
+### ciroad:reset
 
 強制重新載入所有 HTTP Worker。
 
