@@ -7,12 +7,12 @@ class InitLibrary extends BaseCommand
 {
     protected $group       = 'ciroad';
     protected $name        = 'ciroad:init';
-    protected $description = 'Init all file.';
+    protected $description = 'Initialize required files.';
 
     public function run(array $params)
     {
         CLI::write(
-            CLI::color("Initializing Roadrunner Server binary ......\n","blue")
+            CLI::color("Initializing RoadRunner Server binary ......\n","blue")
         );
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $command = "&&vendor\\bin\\rr get";
@@ -22,7 +22,7 @@ class InitLibrary extends BaseCommand
         $init = popen("cd ".ROOTPATH.$command, 'r');
         pclose($init);
         CLI::write(
-            CLI::color("\nCopy Codeigniter4 Roadrunner file ......\n","blue")
+            CLI::color("\nCopy Codeigniter4 RoadRunner file ......\n","blue")
         );
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $word = "\\";
