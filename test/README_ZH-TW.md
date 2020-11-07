@@ -33,7 +33,7 @@ php spark ciroad:init
 
 在運作測試前，請先打開 `.rr.yaml` 檔案，並確保這個設定檔案具有以下設定：
 
-```=yml
+```yaml
 http:
   address:         0.0.0.0:8080
   workers:
@@ -53,7 +53,7 @@ static:
 接著，你得先打開一個終端機，移動到測試專案的根目錄下，輸入以下指令運作起 Roadrunner 伺服器：
 
 ```
-php spark ciroad:start -d
+php spark ciroad:start -v -d
 ```
 
 最後，再打開一個新的終端機，移動到測試專案下，輸入以下指令運作測試：
