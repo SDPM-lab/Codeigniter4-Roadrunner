@@ -6,7 +6,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/v)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![Total Downloads](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/downloads)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![Latest Unstable Version](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/v/unstable)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![License](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/license)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner)
 
-Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response object between Roadrunner-Worker and Codeigniter4. Since Codeigniter4 doesn't implement PSR-7 standard completely, you need to use this library to allow your Codeigniter4 project to run using RoadRunner Server.
+Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response object between Roadrunner-Worker and Codeigniter4. Since Codeigniter4 doesn't implement  [PSR-7 standard](https://codeigniter.tw/user_guide/intro/psr.html) completely, you need to use this library to allow your Codeigniter4 project to run using RoadRunner Server.
 
 > This library is currently under development, and its functions are not yet stable. Do not use it in production environment.
 
@@ -62,7 +62,7 @@ static:
   dir:   "public"
   forbid: [".php", ".htaccess"]
 ```
-You can create your configuration file according to the [Roadrunner document](https://roadrunner.dev/docs).
+You can create your configuration file according to the [Roadrunner document](https://roadrunner.dev/docs/intro-config).
 
 ## Development Suggestions
 
