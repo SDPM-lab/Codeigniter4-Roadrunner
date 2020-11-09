@@ -7,7 +7,7 @@ use Config\Paths;
 use function error_reporting;
 use ErrorException;
 use Throwable;
-use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
+use SDPMlab\Ci4Roadrunner\ResponseBridge;
 
 /**
  * Exceptions manager
@@ -114,7 +114,7 @@ class Exceptions
 					$this->response->setBody(json_encode($msg));
 				}
 				$this->response->setStatusCode($statusCode);
-				$response = new Ci4ResponseBridge($this->response->send(),$this->rRequest);
+				$response = new ResponseBridge($this->response->send(),$this->rRequest);
 				return $response;
 			}
 		}
@@ -224,7 +224,7 @@ class Exceptions
 		$buffer = ob_get_contents();
 		ob_end_clean();	
 		$this->response->setBody($buffer);
-		$response = new Ci4ResponseBridge($this->response->send(),$this->rRequest);
+		$response = new ResponseBridge($this->response->send(),$this->rRequest);
 		return $response;
 	}
 

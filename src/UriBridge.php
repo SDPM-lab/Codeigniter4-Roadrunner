@@ -1,7 +1,7 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-class Ci4UriBridge
+class UriBridge
 {
     private $_rURI;
 

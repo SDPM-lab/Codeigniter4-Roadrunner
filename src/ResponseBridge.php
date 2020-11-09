@@ -6,7 +6,7 @@ use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\Response\InjectContentTypeTrait;
 use Psr\Http\Message\StreamInterface;
 
-class Ci4ResponseBridge extends Response
+class ResponseBridge extends Response
 {
     use InjectContentTypeTrait;
 

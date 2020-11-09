@@ -8,11 +8,12 @@ require 'vendor/autoload.php';
 
 use Spiral\Goridge;
 use Spiral\RoadRunner;
-use SDPMlab\Ci4Roadrunner\Ci4ResponseBridge;
-use SDPMlab\Ci4Roadrunner\Ci4RequestBridge;
+use SDPMlab\Ci4Roadrunner\ResponseBridge;
+use SDPMlab\Ci4Roadrunner\RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\Debug\Dumper;
+use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
@@ -64,7 +65,7 @@ while ($req = $psr7->acceptRequest()) {
 
     //請求物件相容
     try {
-        $requestBridge = new Ci4RequestBridge($req);
+        $requestBridge = new RequestBridge($req);
         $ci4Req = $requestBridge->getRequest();
     } catch (
         \Throwable $e
@@ -103,7 +104,7 @@ while ($req = $psr7->acceptRequest()) {
 
     //響應物件轉換
     try {
-        $response = new Ci4ResponseBridge($ci4Response,$req);
+        $response = new ResponseBridge($ci4Response,$req);
         //傳遞處理結果
         $psr7->respond($response);
         //初始化 CI4 以及 PHP 輸出輸入內容
@@ -127,6 +128,7 @@ function init()
         ob_end_clean();
     } catch (\Throwable $th) {}
     \CodeIgniter\Config\Services::reset(true);
+    UploadedFileBridge::reset();
     $appConfig = config(\Config\App::class);
     $app       = new \CodeIgniter\CodeIgniter($appConfig);
     $app->initialize();
