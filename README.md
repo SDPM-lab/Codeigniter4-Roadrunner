@@ -10,6 +10,8 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 
 > This library is currently under development, and its functions are not yet stable. Do not use it in production environment.
 
+[正體中文說明書](https://github.com/SDPM-lab/Codeigniter4-Roadrunner/blob/dev/README_zh-TW.md)
+
 ## Install
 
 ### Prerequisites
