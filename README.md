@@ -6,7 +6,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/v)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![Total Downloads](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/downloads)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![Latest Unstable Version](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/v/unstable)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner) [![License](https://poser.pugx.org/sdpmlab/codeigniter4-roadrunner/license)](//packagist.org/packages/sdpmlab/codeigniter4-roadrunner)
 
-Make Codeigniter4 work on Roadrunner Server.
+Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response object between Roadrunner-Worker and Codeigniter4. Since Codeigniter4 doesn't implement PSR-7 standard completely, you need to use this library to allow your Codeigniter4 project to run using RoadRunner Server.
 
 > This library is currently under development, and its functions are not yet stable. Do not use it in production environment.
 
@@ -15,6 +15,8 @@ Make Codeigniter4 work on Roadrunner Server.
 ### Prerequisites
 1. CodeIgniter Framework 4.*
 2. Composer
+3. Enable `php-curl` extension
+4. Enable `php-zip` extension
 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
@@ -31,7 +33,7 @@ php spark ciroad:init
 Run the command in the root directory of your project:
 1. Use Codeigniter4 spark command
   ```
-  php spark ciroad:start
+  php spark ciroad:start -v -d
   ```
 2. Use Roadrunner command in Windows
   ```
@@ -44,7 +46,7 @@ Run the command in the root directory of your project:
 
 ## Server Settings
 The server settings are all in the project root directory ".rr.yaml". The default file will look like this:
-```
+```yaml
 http:
   address:         0.0.0.0:8080
   workers:
