@@ -23,7 +23,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta.1"
+composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta.2"
 ```
 Initialize Roadrunner and files using built-in commands in the library
 
@@ -91,7 +91,7 @@ Codeigniter4 does not implement the complete [HTTP message interface](https://ww
 
 Base on the reasons above, You should use `$this->request`, provided by Codeigniter4, or the global function `/Config/Services::('request')` to fetch the correct request object; Use `$this->response` or `/Config/Services::('response')` to fetch the correct response object.
 
-Please be noticed, while constructing response for the users during developing, you should prevent using PHP built-in methods to conduct `header` or `set-cookies` settings. Using the `setHeader()` and `setCookie()`, provided by the [Codeigniter4 Response Object](https://codeigniter.tw/user_guide/outgoing/response.html), to conduct setting.
+Please be noticed, while constructing response for the users during developing, you should prevent using PHP built-in methods to conduct `header` or `set-cookies` settings. Using the `setHeader()` and `setCookie()`, provided by the [Codeigniter4 Response Object](https://codeigniter.com/user_guide/outgoing/response.html), to conduct setting.
 
 ### Use return to stop controller logic
 
@@ -127,7 +127,7 @@ class Home extends BaseController
 
 ### Use the built-in Session library
 
-We only focus on supporting the Codeigniter4 built-in [Session library](https://codeigniter.tw/user_guide/libraries/sessions.html), and do not guarantee if using `session_start()` and `$_SEEEION` can work as normal. So, you should avoid using the PHP built-in Session method, change to the Codeigniter4 framework built-in library.
+We only focus on supporting the Codeigniter4 built-in [Session library](https://codeigniter.com/user_guide/libraries/sessions.html), and do not guarantee if using `session_start()` and `$_SEEEION` can work as normal. So, you should avoid using the PHP built-in Session method, change to the Codeigniter4 framework built-in library.
 
 ### Developing and debugging in a environment with only one Worker
 
