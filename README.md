@@ -145,11 +145,15 @@ http:
       # maxJobs:  500
 ```
 
-### 資料庫連線
+### Database Connection
 
-我們只針對 Codeigniter4 內建 [Database 程式庫](https://codeigniter.com/user_guide/database/index.html) 進行支援，並不保證 PHP 內鍵的方法是否能照常運作。所以，你應該避免使用內建的 PHP 資料庫連線方法，而是以 Codeigniter4 框架內建的程式庫為主。
+We only focus on supporting the Codeigniter4 built-in [Database Library](https://codeigniter.com/user_guide/database/index.html), hence we do not guarantee if using the PHP
+built-in method should work as normal. Therefore, you should avoid using the PHP built-in database connection method but
+pick the Codeigniter4 framework built-in library.
 
-預設的情況下，在 Worker 中的 DB 連線是持久的，並會在連線失效時自動重新連線。所有進入 Worker 的 Request 都使用同一個 DB 連線實體。如果你不想要這個預設設定，希望每個進入 Worker 的 Request 都使用重新連線的 DB 連線實體。你可以在專案根目錄下的 `.env` 檔案加入以下設定。
+Under the default situation, DB of the Worker should be lasting, and will try to reconnect once the connection is failed.
+Every Request that goes into Worker is using a same DB connection instance. If you don't want this default setting but expecting
+every Request to use the reconnect DB connection instance. You can add the configuration down below into the `.env`  file under the root directory.
 
 ```env
 CIROAD_DB_AUTOCLOSE = true
