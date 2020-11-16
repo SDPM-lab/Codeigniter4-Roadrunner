@@ -23,7 +23,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0"
+composer require sdpmlab/codeigniter4-roadrunner
 ```
 Initialize Roadrunner and files using built-in commands in the library
 

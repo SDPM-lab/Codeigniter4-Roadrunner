@@ -23,7 +23,7 @@ Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Requ
 於專案根目錄下，使用 Composer 下載程式庫與其所需之依賴。
 
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0"
+composer require sdpmlab/codeigniter4-roadrunner
 ```
 
 使用程式庫提供的內建指令初始化 Roadrunner 與其所需的檔案。
