@@ -14,6 +14,7 @@ use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\Debug\Dumper;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
+use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
@@ -56,12 +57,7 @@ function dump($value,string $target = "ERROR_LOG") : ?string{
     return Dumper::getInstance()->dump($value,$target);
 }
 
-$count = 0;
 while ($req = $psr7->acceptRequest()) {
-    //Memory control
-    if ($count++ > 500) {
-        break;
-    }
 
     //handle request object
     try {
@@ -91,6 +87,7 @@ while ($req = $psr7->acceptRequest()) {
 
     //run framework and error handling
     try{
+        if(!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
         $ci4Response = $app->setRequest($ci4Req)->run();
     }catch(
         \Throwable $e
@@ -130,9 +127,8 @@ function init()
     
     UploadedFileBridge::reset();
 
-    $dbConnections = \Config\Database::getConnections();
-    foreach ($dbConnections as $db) {
-        $db->close();
+    if(env("CIROAD_DB_AUTOCLOSE")){
+        HandleDBConnection::closeConnect();
     }
 
     $appConfig = config(\Config\App::class);
