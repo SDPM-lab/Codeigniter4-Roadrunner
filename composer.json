@@ -18,7 +18,7 @@
     "require": {
         "php" : "^7.2",
         "codeigniter4/framework": "^4",
-        "spiral/roadrunner": "1.8.1",
+        "spiral/roadrunner": "^1.8.1",
         "spiral/dumper": "^1.1"
     },
     "autoload": {
