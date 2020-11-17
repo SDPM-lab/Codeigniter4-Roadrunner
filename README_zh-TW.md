@@ -8,8 +8,6 @@
 
 Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Request 與 Response 物件上的同步，因為 Codeigniter4 並沒有完整實作 [PSR-7 規範](https://codeigniter.tw/user_guide/intro/psr.html)。所以你需要使用這個程式庫才能讓你的 Codeigniter4 專案透過 RoadRunner Server 運作。
 
-> 這個程式庫目前處於開發版，功能尚未穩定。請不要將它運用在正式環境中。
-
 ## 安裝
 
 ### 需求
