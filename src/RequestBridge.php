@@ -7,77 +7,69 @@ use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class RequestBridge 
 {
-    private $_rRequest;
+    private static $_rRequest;
 
-    public function __construct(ServerRequest $rRequest)
+    public static function setRequest(ServerRequest $rRequest)
     {
-        $this->_rRequest = $rRequest;
-        $this->setFile();
-        $_SERVER['HTTP_USER_AGENT'] = $this->_rRequest->getHeaderLine("User-Agent");
+        self::$_rRequest = $rRequest;
+        self::setFile();
+        $_SERVER['HTTP_USER_AGENT'] = self::$_rRequest->getHeaderLine("User-Agent");
         \CodeIgniter\Config\Services::request(new \Config\App(),false);
         \CodeIgniter\Config\Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
-        $this->setUri();
-        \CodeIgniter\Config\Services::request()->setBody($this->getBody());
-        $this->setParams();
-        $this->setHeader();
+        UriBridge::setUri(self::$_rRequest->getUri());
+        \CodeIgniter\Config\Services::request()->setBody(self::getBody());
+        self::setParams();
+        self::setHeader();
+        return \CodeIgniter\Config\Services::request();
     }
 
-    private function setFile(){
-        if(count($this->_rRequest->getUploadedFiles()) > 0){
-            UploadedFileBridge::getPsr7UploadedFiles($this->_rRequest->getUploadedFiles(),true);
+    protected static function setFile(){
+        if(count(self::$_rRequest->getUploadedFiles()) > 0){
+            UploadedFileBridge::getPsr7UploadedFiles(self::$_rRequest->getUploadedFiles(),true);
         }
     }
 
-    private function getBody(){
+    protected static function getBody(){
         $body = "";
-        if(strpos($this->_rRequest->getHeaderLine("content-type"), "application/json") === 0){
-            $body = $this->_rRequest->getBody();
+        if(strpos(self::$_rRequest->getHeaderLine("content-type"), "application/json") === 0){
+            $body = self::$_rRequest->getBody();
         }else if(
-            strpos($this->_rRequest->getHeaderLine("content-type"), "text/plain") === 0 ||
-            strpos($this->_rRequest->getHeaderLine("content-type"), "application/javascript") === 0 ||
-            strpos($this->_rRequest->getHeaderLine("content-type"), "text/html") === 0 ||
-            strpos($this->_rRequest->getHeaderLine("content-type"), "application/xml") === 0
+            strpos(self::$_rRequest->getHeaderLine("content-type"), "text/plain") === 0 ||
+            strpos(self::$_rRequest->getHeaderLine("content-type"), "application/javascript") === 0 ||
+            strpos(self::$_rRequest->getHeaderLine("content-type"), "text/html") === 0 ||
+            strpos(self::$_rRequest->getHeaderLine("content-type"), "application/xml") === 0
         ){
-            $body = $this->_rRequest->getBody()->getContents();
+            $body = self::$_rRequest->getBody()->getContents();
         }else{
-            $body = http_build_query($this->_rRequest->getParsedBody()??[]);
+            $body = http_build_query(self::$_rRequest->getParsedBody()??[]);
         }
         return $body;
     }
 
-    private function setParams(){
-        \CodeIgniter\Config\Services::request()->setMethod($this->_rRequest->getMethod());
-        \CodeIgniter\Config\Services::request()->setGlobal("get",$this->_rRequest->getQueryParams());
-        if($this->_rRequest->getMethod() == "POST"){
-            \CodeIgniter\Config\Services::request()->setGlobal("post",$this->_rRequest->getParsedBody());
+    protected static function setParams(){
+        \CodeIgniter\Config\Services::request()->setMethod(self::$_rRequest->getMethod());
+        \CodeIgniter\Config\Services::request()->setGlobal("get",self::$_rRequest->getQueryParams());
+        if(self::$_rRequest->getMethod() == "POST"){
+            \CodeIgniter\Config\Services::request()->setGlobal("post",self::$_rRequest->getParsedBody());
         }
         $_COOKIE = [];
-        \CodeIgniter\Config\Services::request()->setGlobal("cookie",$this->_rRequest->getCookieParams());
-        foreach ($this->_rRequest->getCookieParams() as $key => $value) {
+        \CodeIgniter\Config\Services::request()->setGlobal("cookie",self::$_rRequest->getCookieParams());
+        foreach (self::$_rRequest->getCookieParams() as $key => $value) {
             $_COOKIE[$key] = $value;
         }
         if(isset($_COOKIE[config(App::class)->sessionCookieName])){
             session_id($_COOKIE[config(App::class)->sessionCookieName]);
         }
-        \CodeIgniter\Config\Services::request()->setGlobal("server",$this->_rRequest->getServerParams());    
+        \CodeIgniter\Config\Services::request()->setGlobal("server",self::$_rRequest->getServerParams());    
     }
 
-    private function setHeader(){
-        $rHeader = $this->_rRequest->getHeaders();
+    protected static function setHeader(){
+        $rHeader = self::$_rRequest->getHeaders();
         foreach ($rHeader as $key => $datas) {
             foreach ($datas as $values) {
                 \CodeIgniter\Config\Services::request()->setHeader($key,$values);
             }
         }
-    }
-
-    private function setUri(){
-        $uriBridge = new UriBridge($this->_rRequest->getUri());
-        $uriBridge->setUri();
-    }
-
-    public function getRequest(){
-        return \CodeIgniter\Config\Services::request();
     }
 
 }

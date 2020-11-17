@@ -61,8 +61,7 @@ while ($req = $psr7->acceptRequest()) {
 
     //handle request object
     try {
-        $requestBridge = new RequestBridge($req);
-        $ci4Req = $requestBridge->getRequest();
+        $ci4Req = RequestBridge::setRequest($req);
     } catch (
         \Throwable $e
     ){
