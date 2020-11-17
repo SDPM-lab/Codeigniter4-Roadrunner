@@ -33,15 +33,8 @@ class RequestBridge
         $body = "";
         if(strpos(self::$_rRequest->getHeaderLine("content-type"), "application/json") === 0){
             $body = self::$_rRequest->getBody();
-        }else if(
-            strpos(self::$_rRequest->getHeaderLine("content-type"), "text/plain") === 0 ||
-            strpos(self::$_rRequest->getHeaderLine("content-type"), "application/javascript") === 0 ||
-            strpos(self::$_rRequest->getHeaderLine("content-type"), "text/html") === 0 ||
-            strpos(self::$_rRequest->getHeaderLine("content-type"), "application/xml") === 0
-        ){
-            $body = self::$_rRequest->getBody()->getContents();
         }else{
-            $body = http_build_query(self::$_rRequest->getParsedBody()??[]);
+            $body = self::$_rRequest->getBody()->getContents();
         }
         return $body;
     }

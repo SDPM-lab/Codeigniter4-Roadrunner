@@ -91,10 +91,6 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
     public function testCanGrabGetRawInput()
 	{
 		$rawstring = 'username=admin001&role=administrator&usepass=0';
-        $headers=[
-            "Content-Length" => strlen($rawstring),
-            'Content-Type' => "text/plain; charset=utf-8"
-        ];
 		$expected = [
 			'username' => 'admin001',
 			'role'     => 'administrator',
@@ -105,8 +101,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
             [],
             "/api/put",
             "PUT",
-            fopen('data://text/plain,' . $rawstring,'r'),
-            $headers
+            fopen('data://text/plain,' . $rawstring,'r')
         );
         RequestBridge::setRequest($psrRequest);
         $ci4Request = Services::request();
