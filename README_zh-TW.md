@@ -8,8 +8,6 @@
 
 Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Request 與 Response 物件上的同步，因為 Codeigniter4 並沒有完整實作 [PSR-7 規範](https://codeigniter.tw/user_guide/intro/psr.html)。所以你需要使用這個程式庫才能讓你的 Codeigniter4 專案透過 RoadRunner Server 運作。
 
-> 這個程式庫目前處於開發版，功能尚未穩定。請不要將它運用在正式環境中。
-
 ## 安裝
 
 ### 需求
@@ -23,7 +21,7 @@ Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Requ
 於專案根目錄下，使用 Composer 下載程式庫與其所需之依賴。
 
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta.2"
+composer require sdpmlab/codeigniter4-roadrunner
 ```
 
 使用程式庫提供的內建指令初始化 Roadrunner 與其所需的檔案。
@@ -60,7 +58,7 @@ http:
     command:  "php psr-worker.php"
     # pool:
     #   numWorkers: 50
-    #   maxJobs:  10
+    #   maxJobs:  500
 
 static:
   enable:  true
@@ -146,7 +144,17 @@ http:
     command:  "php psr-worker.php"
     pool:
       numWorkers: 1
-      maxJobs:  1
+      # maxJobs:  500
+```
+
+### 資料庫連線
+
+我們只針對 Codeigniter4 內建 [Database 程式庫](https://codeigniter.tw/user_guide/database/index.html) 進行支援，並不保證 PHP 內建的方法是否能照常運作。所以，你應該避免使用內建的 PHP 資料庫連線方法，而是以 Codeigniter4 框架內建的程式庫為主。
+
+預設的情況下，在 Worker 中的 DB 連線是持久的，並會在連線失效時自動重新連線。所有進入 Worker 的 Request 都使用同一個 DB 連線實體。如果你不想要這個預設設定，希望每個進入 Worker 的 Request 都使用重新連線的 DB 連線實體。你可以在專案根目錄下的 `.env` 檔案加入以下設定。
+
+```env
+CIROAD_DB_AUTOCLOSE = true
 ```
 
 ## 全域方法

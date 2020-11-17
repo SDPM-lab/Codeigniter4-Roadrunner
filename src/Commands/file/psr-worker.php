@@ -14,6 +14,7 @@ use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\Debug\Dumper;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
+use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 
 // codeigniter4 public/index.php
 $minPHPVersion = '7.2';
@@ -56,17 +57,11 @@ function dump($value,string $target = "ERROR_LOG") : ?string{
     return Dumper::getInstance()->dump($value,$target);
 }
 
-$count = 0;
 while ($req = $psr7->acceptRequest()) {
-    //記憶體控制
-    if ($count++ > 500) {
-        break;
-    }
 
-    //請求物件相容
+    //handle request object
     try {
-        $requestBridge = new RequestBridge($req);
-        $ci4Req = $requestBridge->getRequest();
+        $ci4Req = RequestBridge::setRequest($req);
     } catch (
         \Throwable $e
     ){
@@ -74,7 +69,7 @@ while ($req = $psr7->acceptRequest()) {
         $psr7->getWorker()->error((string)$e);
     }
 
-    //處理除錯工具列
+    //handle debug-bar
     try{
         if(ENVIRONMENT === 'development'){
             $toolbar = new Toolbar(config('Toolbar'),$ci4Req);
@@ -89,8 +84,9 @@ while ($req = $psr7->acceptRequest()) {
         $psr7->getWorker()->error((string)$e);
     }
 
-    //執行框架邏輯與錯誤處理
+    //run framework and error handling
     try{
+        if(!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
         $ci4Response = $app->setRequest($ci4Req)->run();
     }catch(
         \Throwable $e
@@ -102,12 +98,10 @@ while ($req = $psr7->acceptRequest()) {
         continue;
     }
 
-    //響應物件轉換
+    //handle response object
     try {
         $response = new ResponseBridge($ci4Response,$req);
-        //傳遞處理結果
         $psr7->respond($response);
-        //初始化 CI4 以及 PHP 輸出輸入內容
         init();
     } catch (
         \Throwable $e
@@ -127,8 +121,15 @@ function init()
     try {
         ob_end_clean();
     } catch (\Throwable $th) {}
+
     \CodeIgniter\Config\Services::reset(true);
+    
     UploadedFileBridge::reset();
+
+    if(env("CIROAD_DB_AUTOCLOSE")){
+        HandleDBConnection::closeConnect();
+    }
+
     $appConfig = config(\Config\App::class);
     $app       = new \CodeIgniter\CodeIgniter($appConfig);
     $app->initialize();

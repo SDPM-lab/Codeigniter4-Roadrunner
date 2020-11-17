@@ -3,21 +3,17 @@ namespace SDPMlab\Ci4Roadrunner;
 
 class UriBridge
 {
-    private $_rURI;
+    private static $_rURI;
 
-    public function __construct(\Laminas\Diactoros\Uri $rURI)
-    {
+    public static function setUri(\Laminas\Diactoros\Uri $rURI){
         \CodeIgniter\Config\Services::uri(null,false);
-        $this->_rURI = $rURI;
+        self::$_rURI = $rURI;
+        self::transferPath();
+        self::transferQuery();
     }
 
-    public function setUri(){
-        $this->transferPath();
-        $this->transferQuery();
-    }
-
-    private function transferPath(){
-        $rPath = $this->_rURI->getPath();
+    protected static function transferPath(){
+        $rPath = self::$_rURI->getPath();
 
         if($rPath == "/"){
             \CodeIgniter\Config\Services::uri()->setPath($rPath);
@@ -38,8 +34,8 @@ class UriBridge
 
     }
 
-    private function transferQuery(){
-        \CodeIgniter\Config\Services::uri()->setQuery($this->_rURI->getQuery());
+    protected static function transferQuery(){
+        \CodeIgniter\Config\Services::uri()->setQuery(self::$_rURI->getQuery());
     }
 
 }

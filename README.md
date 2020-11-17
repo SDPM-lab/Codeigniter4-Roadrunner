@@ -8,8 +8,6 @@
 
 Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response object between Roadrunner-Worker and Codeigniter4. Since Codeigniter4 doesn't implement  [PSR-7 standard](https://codeigniter.tw/user_guide/intro/psr.html) completely, you need to use this library to allow your Codeigniter4 project to run using RoadRunner Server.
 
-> This library is currently under development, and its functions are not yet stable. Do not use it in production environment.
-
 [正體中文說明書](https://github.com/SDPM-lab/Codeigniter4-Roadrunner/blob/dev/README_zh-TW.md)
 
 ## Install
@@ -23,7 +21,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
 ```
-composer require sdpmlab/codeigniter4-roadrunner "v1.0.0-beta.2"
+composer require sdpmlab/codeigniter4-roadrunner
 ```
 Initialize Roadrunner and files using built-in commands in the library
 
@@ -55,7 +53,7 @@ http:
     command:  "php psr-worker.php"
     # pool:
     #   numWorkers: 50
-    #   maxJobs:  10
+    #   maxJobs:  500
 
 static:
   enable:  true
@@ -142,7 +140,21 @@ http:
     command:  "php psr-worker.php"
     pool:
       numWorkers: 1
-      maxJobs:  1
+      # maxJobs:  500
+```
+
+### Database Connection
+
+We only focus on supporting the Codeigniter4 built-in [Database Library](https://codeigniter.com/user_guide/database/index.html), hence we do not guarantee if using the PHP
+built-in method should work as normal. Therefore, you should avoid using the PHP built-in database connection method but
+pick the Codeigniter4 framework built-in library.
+
+Under the default situation, DB of the Worker should be lasting, and will try to reconnect once the connection is failed.
+Every Request that goes into Worker is using a same DB connection instance. If you don't want this default setting but expecting
+every Request to use the reconnect DB connection instance. You can add the configuration down below into the `.env`  file under the root directory.
+
+```env
+CIROAD_DB_AUTOCLOSE = true
 ```
 
 # Global Methods
