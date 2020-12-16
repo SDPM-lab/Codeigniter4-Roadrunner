@@ -29,7 +29,7 @@ class ResponseBridge extends Response
 
     private function getCi4ContentType(\CodeIgniter\HTTP\Response $ci4Response) : string{
         $ci4headers = $ci4Response->getHeaders();
-        return $ci4headers['Content-Type']->getValue();
+        return $ci4headers['Content-Type']->getValueLine();
     }
 
     private function getCi4Headers(\CodeIgniter\HTTP\Response $ci4Response) : array{
@@ -58,7 +58,7 @@ class ResponseBridge extends Response
         $headers = [];
         foreach ($ci4headers as $key => $value){
             if($key == "Content-Type") continue ;
-            $headers[$key] = $value->getValue();
+            $headers[$key] = $value->getValueLine();
         }
         return $headers;
     }
