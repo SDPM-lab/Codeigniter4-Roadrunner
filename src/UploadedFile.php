@@ -26,7 +26,8 @@ class UploadedFile implements UploadedFileInterface
 	 *
 	 * @var boolean
 	 */
-	protected $hasMoved = false;
+    protected $hasMoved = false;
+    protected $stream;
 
     
     /**
