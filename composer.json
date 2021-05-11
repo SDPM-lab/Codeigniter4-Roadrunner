@@ -16,8 +16,8 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php" : "^7.2",
-        "codeigniter4/framework": "^4",
+        "php" : "^7.3",
+        "codeigniter4/framework": "^4.1.1",
         "spiral/roadrunner": "^1.8.1",
         "spiral/dumper": "^1.1"
     },
