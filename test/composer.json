@@ -8,8 +8,7 @@
 		"php": ">=7.2",
 		"codeigniter4/framework": "^4",
 		"spiral/roadrunner": "^1.8",
-		"spiral/dumper": "^1.1",
-		"monken/cli-create": "^0.3.1"
+		"spiral/dumper": "^1.1"
 	},
 	"require-dev": {
 		"mikey179/vfsstream": "1.6.*",

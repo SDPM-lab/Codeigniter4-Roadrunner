@@ -13,7 +13,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ## Install
 
 ### Prerequisites
-1. CodeIgniter Framework 4.*
+1. CodeIgniter Framework 4.1.1^
 2. Composer
 3. Enable `php-curl` extension
 4. Enable `php-zip` extension
