@@ -4,7 +4,7 @@ http:
     command:  "php psr-worker.php"
     pool:
       numWorkers: 1
-    #   maxJobs:  500
+      # maxJobs:  50
 
 static:
   enable:  true

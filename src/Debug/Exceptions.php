@@ -105,7 +105,7 @@ class Exceptions
 		if (! is_cli())
 		{
 			$this->response->setStatusCode($statusCode);
-			$header = "HTTP/{$this->request->getProtocolVersion()} {$this->response->getStatusCode()} {$this->response->getReason()}";
+			$header = "HTTP/{$this->request->getProtocolVersion()} {$this->response->getStatusCode()} {$this->response->getReasonPhrase()}";
 			header($header, true, $statusCode);
 			if (strpos($this->rRequest->getHeaderLine('accept'), 'text/html') === false)
 			{
