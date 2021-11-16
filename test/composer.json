@@ -7,8 +7,10 @@
 	"require": {
 		"php": ">=7.2",
 		"codeigniter4/framework": "^4",
-		"spiral/roadrunner": "^1.8",
-		"spiral/dumper": "^1.1"
+		"spiral/roadrunner": "^2",
+		"spiral/dumper": "^1.1",
+		"nyholm/psr7": "^1.4",
+		"laminas/laminas-diactoros": "^2.8"
 	},
 	"require-dev": {
 		"mikey179/vfsstream": "1.6.*",

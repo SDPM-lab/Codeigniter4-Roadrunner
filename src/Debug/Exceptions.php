@@ -1,4 +1,5 @@
 <?php
+
 namespace SDPMlab\Ci4Roadrunner\Debug;
 
 use CodeIgniter\API\ResponseTrait;
@@ -8,6 +9,7 @@ use function error_reporting;
 use ErrorException;
 use Throwable;
 use SDPMlab\Ci4Roadrunner\ResponseBridge;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Exceptions manager
@@ -56,7 +58,7 @@ class Exceptions
 	/**
 	 * Roadrunner Request
 	 *
-	 * @var \Laminas\Diactoros\ServerRequest
+	 * @var \Psr\Http\Message\ServerRequestInterface
 	 */
 	protected $rRequest;
 
@@ -77,9 +79,8 @@ class Exceptions
 	 * @param \CodeIgniter\HTTP\Response        $response
 	 */
 	public function __construct(
-		\Laminas\Diactoros\ServerRequest $rRequest
-	)
-	{
+		ServerRequestInterface $rRequest
+	) {
 		$this->config = new \Config\Exceptions();
 		$this->ob_level = ob_get_level();
 		$this->viewPath = rtrim($this->config->errorViewPath, '/ ') . '/';
@@ -93,34 +94,31 @@ class Exceptions
 		// @codeCoverageIgnoreStart
 		$codes      = $this->determineCodes($exception);
 		$statusCode = $codes[0];
-		
+
 		// Log it
-		if ($this->config->log === true && ! in_array($statusCode, $this->config->ignoreCodes))
-		{
+		if ($this->config->log === true && !in_array($statusCode, $this->config->ignoreCodes)) {
 			log_message('critical', $exception->getMessage() . "\n{trace}", [
-							'trace' => $exception->getTraceAsString(),
-						]);
+				'trace' => $exception->getTraceAsString(),
+			]);
 		}
 
-		if (! is_cli())
-		{
+		if (!is_cli()) {
 			$this->response->setStatusCode($statusCode);
 			$header = "HTTP/{$this->request->getProtocolVersion()} {$this->response->getStatusCode()} {$this->response->getReasonPhrase()}";
 			header($header, true, $statusCode);
-			if (strpos($this->rRequest->getHeaderLine('accept'), 'text/html') === false)
-			{
+			if (strpos($this->rRequest->getHeaderLine('accept'), 'text/html') === false) {
 				$msg = $this->collectVars($exception, $statusCode);
-				if(ENVIRONMENT === 'development'){
+				if (ENVIRONMENT === 'development') {
 					$this->response->setBody(json_encode($msg));
 				}
 				$this->response->setStatusCode($statusCode);
-				$response = new ResponseBridge($this->response->send(),$this->rRequest);
+				$response = new ResponseBridge($this->response->send(), $this->rRequest);
 				return $response;
 			}
 		}
 
 		return $this->render($exception, $statusCode);
-		
+
 		// @codeCoverageIgnoreEnd
 	}
 
@@ -141,8 +139,7 @@ class Exceptions
 	 */
 	public function errorHandler(int $severity, string $message, string $file = null, int $line = null)
 	{
-		if (! (error_reporting() & $severity))
-		{
+		if (!(error_reporting() & $severity)) {
 			return;
 		}
 
@@ -167,20 +164,17 @@ class Exceptions
 		$view          = 'production.php';
 		$template_path = rtrim($template_path, '/ ') . '/';
 
-		if (str_ireplace(['off', 'none', 'no', 'false', 'null'], '', ini_get('display_errors')))
-		{
+		if (str_ireplace(['off', 'none', 'no', 'false', 'null'], '', ini_get('display_errors'))) {
 			$view = 'error_exception.php';
 		}
 
 		// 404 Errors
-		if ($exception instanceof PageNotFoundException)
-		{
+		if ($exception instanceof PageNotFoundException) {
 			return 'error_404.php';
 		}
 
 		// Allow for custom views based upon the status code
-		else if (is_file($template_path . 'error_' . $exception->getCode() . '.php'))
-		{
+		else if (is_file($template_path . 'error_' . $exception->getCode() . '.php')) {
 			return 'error_' . $exception->getCode() . '.php';
 		}
 
@@ -199,8 +193,7 @@ class Exceptions
 	{
 		// Determine directory with views
 		$path = $this->viewPath;
-		if (empty($path))
-		{
+		if (empty($path)) {
 			$paths = new Paths();
 			$path  = $paths->viewDirectory . '/errors/';
 		}
@@ -215,16 +208,15 @@ class Exceptions
 		extract($vars);
 
 		// Render it
-		if (ob_get_level() > $this->ob_level + 1)
-		{
+		if (ob_get_level() > $this->ob_level + 1) {
 			ob_end_clean();
 		}
 		ob_start();
 		include($path . $view);
 		$buffer = ob_get_contents();
-		ob_end_clean();	
+		ob_end_clean();
 		$this->response->setBody($buffer);
-		$response = new ResponseBridge($this->response->send(),$this->rRequest);
+		$response = new ResponseBridge($this->response->send(), $this->rRequest);
 		return $response;
 	}
 
@@ -262,17 +254,14 @@ class Exceptions
 	{
 		$statusCode = abs($exception->getCode());
 
-		if ($statusCode < 100 || $statusCode > 599)
-		{
+		if ($statusCode < 100 || $statusCode > 599) {
 			$exitStatus = $statusCode + EXIT__AUTO_MIN; // 9 is EXIT__AUTO_MIN
 			if ($exitStatus > EXIT__AUTO_MAX) // 125 is EXIT__AUTO_MAX
 			{
 				$exitStatus = EXIT_ERROR; // EXIT_ERROR
 			}
 			$statusCode = 500;
-		}
-		else
-		{
+		} else {
 			$exitStatus = 1; // EXIT_ERROR
 		}
 
@@ -298,8 +287,7 @@ class Exceptions
 	 */
 	public static function cleanPath(string $file): string
 	{
-		switch (true)
-		{
+		switch (true) {
 			case strpos($file, APPPATH) === 0:
 				$file = 'APPPATH' . DIRECTORY_SEPARATOR . substr($file, strlen(APPPATH));
 				break;
@@ -329,12 +317,9 @@ class Exceptions
 	 */
 	public static function describeMemory(int $bytes): string
 	{
-		if ($bytes < 1024)
-		{
+		if ($bytes < 1024) {
 			return $bytes . 'B';
-		}
-		else if ($bytes < 1048576)
-		{
+		} else if ($bytes < 1048576) {
 			return round($bytes / 1024, 2) . 'KB';
 		}
 
@@ -354,14 +339,12 @@ class Exceptions
 	 */
 	public static function highlightFile(string $file, int $lineNumber, int $lines = 15)
 	{
-		if (empty($file) || ! is_readable($file))
-		{
+		if (empty($file) || !is_readable($file)) {
 			return false;
 		}
 
 		// Set our highlight colors:
-		if (function_exists('ini_set'))
-		{
+		if (function_exists('ini_set')) {
 			ini_set('highlight.comment', '#767a7e; font-style: italic');
 			ini_set('highlight.default', '#c7c7c7');
 			ini_set('highlight.html', '#06B');
@@ -369,12 +352,9 @@ class Exceptions
 			ini_set('highlight.string', '#869d6a');
 		}
 
-		try
-		{
+		try {
 			$source = file_get_contents($file);
-		}
-		catch (Throwable $e)
-		{
+		} catch (Throwable $e) {
 			return false;
 		}
 
@@ -401,25 +381,24 @@ class Exceptions
 		// showing correctly.
 		$spans = 1;
 
-		foreach ($source as $n => $row)
-		{
+		foreach ($source as $n => $row) {
 			$spans += substr_count($row, '<span') - substr_count($row, '</span');
 			$row    = str_replace(["\r", "\n"], ['', ''], $row);
 
-			if (($n + $start + 1) === $lineNumber)
-			{
+			if (($n + $start + 1) === $lineNumber) {
 				preg_match_all('#<[^>]+>#', $row, $tags);
-				$out .= sprintf("<span class='line highlight'><span class='number'>{$format}</span> %s\n</span>%s", $n + $start + 1, strip_tags($row), implode('', $tags[0])
+				$out .= sprintf(
+					"<span class='line highlight'><span class='number'>{$format}</span> %s\n</span>%s",
+					$n + $start + 1,
+					strip_tags($row),
+					implode('', $tags[0])
 				);
-			}
-			else
-			{
+			} else {
 				$out .= sprintf('<span class="line"><span class="number">' . $format . '</span> %s', $n + $start + 1, $row) . "\n";
 			}
 		}
 
-		if ($spans > 0)
-		{
+		if ($spans > 0) {
 			$out .= str_repeat('</span>', $spans);
 		}
 

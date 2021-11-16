@@ -1,11 +1,13 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
+use Psr\Http\Message\UriInterface;
+
 class UriBridge
 {
     private static $_rURI;
 
-    public static function setUri(\Laminas\Diactoros\Uri $rURI){
+    public static function setUri(UriInterface $rURI){
         \CodeIgniter\Config\Services::uri(null,false);
         self::$_rURI = $rURI;
         self::transferPath();
@@ -31,7 +33,7 @@ class UriBridge
         }
         $path = "/".implode("/",$pathArr);
         \CodeIgniter\Config\Services::uri()->setPath($path);
-
+        \CodeIgniter\Config\Services::request()->setPath($path);
     }
 
     protected static function transferQuery(){

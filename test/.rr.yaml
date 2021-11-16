@@ -1,20 +1,31 @@
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    pool:
-      numWorkers: 1
-      # maxJobs:  50
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php new-psr-worker.php"
+  env:
+    XDEBUG_SESSION: 1
+
+http:
+  address: "0.0.0.0:8080"
+  pool:
+    num_workers: 1
+    debug: true
 
 # reload:
+#   # sync interval
 #   interval: 1s
-#   patterns: [".php"]
+#   # global patterns to sync
+#   patterns: [ ".php" ]
+#   # list of included for sync services
 #   services:
 #     http:
-#       dirs: [""]
+#       # recursive search for file patterns to add
 #       recursive: true
+#       # ignored folders
+#       ignore: [ "vendor" ]
+#       # service specific file pattens to sync
+#       patterns: [ ".php", ".go", ".md" ]
+#       # directories to sync. If recursive is set to true,
+#       # recursive sync will be applied only to the directories in `dirs` section
+#       dirs: [ "." ]

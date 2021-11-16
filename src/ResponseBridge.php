@@ -5,6 +5,7 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\Response\InjectContentTypeTrait;
 use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ResponseBridge extends Response
 {
@@ -14,7 +15,7 @@ class ResponseBridge extends Response
 
     public function __construct(
         \CodeIgniter\HTTP\Response $ci4Response,
-        \Laminas\Diactoros\ServerRequest $rRequest)
+        ServerRequestInterface $rRequest)
     {
         $this->_rRequest = $rRequest;
         parent::__construct(
@@ -104,5 +105,3 @@ class ResponseBridge extends Response
         return $body;
     }
 }
-
-?>

@@ -1,7 +1,7 @@
 <?php
 namespace SDPMlab\Ci4Roadrunner;
 
-use Laminas\Diactoros\ServerRequest;
+use Psr\Http\Message\ServerRequestInterface;
 use SDPMlab\Ci4Roadrunner\UriBridge;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
@@ -9,7 +9,7 @@ class RequestBridge
 {
     private static $_rRequest;
 
-    public static function setRequest(ServerRequest $rRequest)
+    public static function setRequest(ServerRequestInterface $rRequest)
     {
         self::$_rRequest = $rRequest;
         self::setFile();
