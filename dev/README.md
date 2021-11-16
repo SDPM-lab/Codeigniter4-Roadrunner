@@ -1,63 +1,69 @@
-# CodeIgniter 4 Application Starter
+#  Test Case
 
-## What is CodeIgniter?
+This is the Codeigniter4-RoadRunner test case project, it is built by Codeigniter4, and has loaded the Codeigniter4-Roadrunner library class inside the upper directory included in the `src` in.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](http://codeigniter.com).
+You can run the test right after you modified the Codeigniter4-Roadrunner project files, verify if the funtions are complete; Or wirte some related program logic in this project to assist your development.
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## Test Range
 
-More information about the plans for version 4 can be found in [the announcement](http://forum.codeigniter.com/thread-62615.html) on the forums.
+This test case takes the acutal sent CURL Request as test approach, because what Codeigniter4-Roadrunner provide is the synchronization on HTTP Request and Response objects of Roadrunner-Worker and Codeigniter4 (Since Codeigniter4 doesn't implement PSR-7 interface standard). In other words, we just have to verify if the server workes as what we wanted under the actual HTTP connection.
 
-The user guide corresponding to this version of the framework can be found
-[here](https://codeigniter4.github.io/userguide/).
+1. BasicTest：Test HTTP `GET`、`POST`、`query`、`form-data`, and the `php echo` output command, and if `header` can process normally and give us outputs.
+2. FileUploadTest：Test if file upload class can work correctly and move files.
+3. RestTest：Test if Codeigniter4 RESTful library can work properly and can parse every verbs
+4. SessionTest：Test if the Session mode, triggered by the file system can work properly.
 
-## Installation & updates
+## Requirements
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+We recommend you to use the latest PHPUnit. While we're writing scripts, the version we're running at is version `8.5.8`. You might need to use Composer to download the library your project needed back to your develop environment.
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+```
+composer install
+```
 
-## Setup
+Next, you must initiallize the environment that Roadrunner needed.
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```
+php spark ciroad:init
+```
 
-## Important Change with index.php
+Finally, please confirm if the directory has these threee files including `rr`(if your developing under Windows, you will see `rr.exe`), `rr.yaml`, `psr-worker.php`.
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+## Run Tests
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+Before running tests, please open `rr.yaml` file first, and ensure this configuration file has these settings:
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```yaml
+http:
+  address:         0.0.0.0:8080
+  workers:
+    command:  "php psr-worker.php"
+    pool:
+      numWorkers: 1
+    #  maxJobs:  500
 
-## Repository Management
+static:
+  enable:  true
+  dir:   "public"
+  forbid: [".php", ".htaccess"]
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to process. Hence we need to test the stability under the environment with only one worker to prove that it can work properly under several workers.
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+Next, you have to open a terminal and cd to the root directory, type the commands below to run the Roadrunner server:
 
-## Server Requirements
+```
+php spark ciroad:start -v -d
+```
 
-PHP version 7.3 or higher is required, with the following extensions installed:
+Finally, open another new terminal and cd to the test project, type the commands below to run tests:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+```
+./vendor/bin/phpunit
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+If you're running tests under Windows CMD, your command should be like this:
 
-- json (enabled by default - don't turn it off)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php)
-- xml (enabled by default - don't turn it off)
+```
+vendor\bin\phpunit
+```

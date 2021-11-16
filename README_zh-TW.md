@@ -11,10 +11,11 @@ Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Requ
 ## 安裝
 
 ### 需求
-1. CodeIgniter Framework 4.1.1 以上
+1. CodeIgniter Framework 4.1.5 以上
 2. Composer
 3. 安裝並開啟 php-curl 擴充套件
 4. 安裝並開啟 php-zip 擴充套件
+5. 安裝並開啟 php-sockets 擴充套件
 
 ### Composer 安裝
 

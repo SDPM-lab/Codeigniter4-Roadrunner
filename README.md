@@ -17,6 +17,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 2. Composer
 3. Enable `php-curl` extension
 4. Enable `php-zip` extension
+4. Enable `php-sockets` extension
 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project

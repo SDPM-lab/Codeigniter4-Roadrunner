@@ -1,11 +1,11 @@
 <?php namespace SDPMlab\Ci4Roadrunner\Test;
 
-use SDPMlab\Ci4Roadrunner\RequestBridge;
+use SDPMlab\Ci4Roadrunner\RequestHandler;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\ServerRequest;
 use CodeIgniter\Config\Services;
 
-class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
+class RequestHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 {
 
     protected function setUp(): void
@@ -19,7 +19,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_USER_AGENT'] = 'Mozilla';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals('Mozilla', $ci4Request->getUserAgent());
     }
@@ -29,7 +29,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_ACCEPT_CHARSET'] = 'iso-8859-5, unicode-1-1;q=0.8';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
         $this->assertEquals(strtolower($ci4Request->config->charset), $ci4Request->negotiate('charset', ['iso-8859', 'unicode-1-2']));
 	}
@@ -39,7 +39,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_ACCEPT'] = 'text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals('text/html', $ci4Request->negotiate('media', ['text/html', 'text/x-c', 'text/x-dvi', 'text/plain']));
 	}
@@ -49,7 +49,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.4, compress;q=0.5';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals('gzip', $ci4Request->negotiate('encoding', ['gzip', 'compress']));
     }
@@ -59,7 +59,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_ACCEPT_LANGUAGE'] = 'da;q=1.0, en-gb;q=0.8, en;q=0.7';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals('da', $ci4Request->negotiate('language', ['en', 'da']));
     }
@@ -83,7 +83,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
             fopen('data://text/plain,' . $json,'r'),
             $headers
         );
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals($expected, $ci4Request->getJSON(true));
     }
@@ -103,7 +103,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
             "PUT",
             fopen('data://text/plain,' . $rawstring,'r')
         );
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals($expected, $ci4Request->getRawInput());
 	}
@@ -113,7 +113,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_X-Requested-With'] = 'XMLHttpRequest';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertTrue($ci4Request->isAJAX());
     }
@@ -123,7 +123,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_Front-End-Https'] = 'on';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertTrue($ci4Request->isSecure());
 	}
@@ -133,7 +133,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['HTTP_X-Forwarded-Proto'] = 'https';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertTrue($ci4Request->isSecure());
 	}
@@ -143,7 +143,7 @@ class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $server=[];
         $server['REQUEST_METHOD'] = 'WINK';
         $psrRequest = ServerRequestFactory::fromGlobals($server);
-        RequestBridge::setRequest($psrRequest);
+        RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
 		$this->assertEquals('wink', $ci4Request->getMethod());
     }

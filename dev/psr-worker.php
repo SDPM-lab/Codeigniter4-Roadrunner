@@ -6,7 +6,6 @@ use CodeIgniter\CodeIgniter;
 use Spiral\RoadRunner;
 use Nyholm\Psr7;
 use SDPMlab\Ci4Roadrunner\ResponseBridge;
-use SDPMlab\Ci4Roadrunner\RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 
@@ -47,7 +46,6 @@ while (true) {
     //handle request object
     try {
         $ci4Request = RequestHandler::initRequest($request);
-        // $ci4Req = RequestBridge::setRequest($request);
     } catch (\Throwable $e) {
         var_dump((string)$e);
         $psr7->getWorker()->error((string)$e);

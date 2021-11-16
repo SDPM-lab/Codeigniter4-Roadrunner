@@ -1,136 +1,116 @@
 <?php
-/**
- * @var Goridge\RelayInterface $relay
- */
 
-ini_set('display_errors', 'stderr');
-require 'vendor/autoload.php';
+include "vendor/autoload.php";
 
-use Spiral\Goridge;
+use CodeIgniter\CodeIgniter;
 use Spiral\RoadRunner;
+use Nyholm\Psr7;
 use SDPMlab\Ci4Roadrunner\ResponseBridge;
-use SDPMlab\Ci4Roadrunner\RequestBridge;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
-use SDPMlab\Ci4Roadrunner\Debug\Dumper;
+
+use SDPMlab\Ci4Roadrunner\RequestHandler;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 
-// codeigniter4 public/index.php
-$minPHPVersion = '7.2';
-if (phpversion() < $minPHPVersion)
+// CodeIgniter4 init
+function is_cli(): bool
 {
-	die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
-}
-unset($minPHPVersion);
-
-/**
- * Is CLI?
- *
- * Test to see if a request was made from the command line.
- *
- * @return boolean
- */
-function is_cli(): bool{
     return false;
 }
-
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
-$pathsPath = FCPATH . 'app/Config/Paths.php';
 chdir(__DIR__);
-require $pathsPath;
+$pathsConfig = FCPATH . './app/Config/Paths.php';
+require realpath($pathsConfig) ?: $pathsConfig;
 $paths = new Config\Paths();
-$app = require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
+$bootstrap = rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
+$app       = require realpath($bootstrap) ?: $bootstrap;
 
-//worker setting
-$worker = new RoadRunner\Worker(new Goridge\StreamRelay(STDIN, STDOUT));
-$psr7 = new RoadRunner\PSR7Client($worker);
+//roadrunner worker init
+$worker = RoadRunner\Worker::create();
+$psrFactory = new Psr7\Factory\Psr17Factory();
+$psr7 = new RoadRunner\Http\PSR7Worker($worker, $psrFactory, $psrFactory, $psrFactory);
 
- /**
-  * Dump given value into target output.
-  *
-  * @param mixed $value Variable
-  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
-  * @return string|null
-  */
-function dump($value,string $target = "ERROR_LOG") : ?string{
-    return Dumper::getInstance()->dump($value,$target);
-}
-
-while ($req = $psr7->acceptRequest()) {
+while (true) {
+    //get psr7 request
+    try {
+        $request = $psr7->waitRequest();
+        if (!($request instanceof \Psr\Http\Message\ServerRequestInterface)) { // Termination request received
+            break;
+        }
+    } catch (\Exception $e) {
+        $psr7->respond(new Psr7\Response(400)); // Bad Request
+        continue;
+    }
 
     //handle request object
     try {
-        $ci4Req = RequestBridge::setRequest($req);
-    } catch (
-        \Throwable $e
-    ){
-        dump((string)$e);
+        $ci4Request = RequestHandler::initRequest($request);
+    } catch (\Throwable $e) {
+        var_dump((string)$e);
         $psr7->getWorker()->error((string)$e);
     }
 
     //handle debug-bar
-    try{
-        if(ENVIRONMENT === 'development'){
-            $toolbar = new Toolbar(config('Toolbar'),$ci4Req);
-            if($barResponse = $toolbar->respond()){
+    try {
+        if (ENVIRONMENT === 'development') {
+            \Kint\Kint::$mode_default_cli = null;
+            $toolbar = new Toolbar(config('Toolbar'), $ci4Request);
+            if ($barResponse = $toolbar->respond()) {
                 $psr7->respond($barResponse);
-                init();
+                refreshCodeIgniter4();
+                unset($app);
                 continue;
             }
         }
-    } catch (\Throwable $e){
-        dump((string)$e);
+    } catch (\Throwable $e) {
         $psr7->getWorker()->error((string)$e);
     }
 
     //run framework and error handling
-    try{
-        if(!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
-        $ci4Response = $app->setRequest($ci4Req)->run();
-    }catch(
-        \Throwable $e
-    ){
-        $exception = new Exceptions($req);
+    try {
+        if (!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
+        $appConfig = config(\Config\App::class);
+        $app       = new \CodeIgniter\CodeIgniter($appConfig);
+        $app->initialize();
+        $app->setRequest($ci4Request)->run();
+        $ci4Response = \CodeIgniter\Config\Services::response();
+    } catch (\Throwable $e) {
+        $exception = new Exceptions($request);
         $response = $exception->exceptionHandler($e);
         $psr7->respond($response);
-        init();
+        refreshCodeIgniter4();
+        unset($app);
         continue;
     }
 
     //handle response object
     try {
-        $response = new ResponseBridge($ci4Response,$req);
+        // Application code logic
+        $response = new ResponseBridge($ci4Response, $request);
         $psr7->respond($response);
-        init();
-    } catch (
-        \Throwable $e
-    ){
-        dump((string)$e);
-        $psr7->getWorker()->error((string)$e);
+        refreshCodeIgniter4();
+        unset($app);
+    } catch (\Exception $e) {
+        $psr7->respond(new Psr7\Response(500, [], 'Something Went Wrong!'));
     }
 }
 
-$psr7->getWorker()->stop();
-
-function init()
+function refreshCodeIgniter4()
 {
     $input = fopen("php://input", "w");
     fwrite($input, "");
     fclose($input);
     try {
         ob_end_clean();
-    } catch (\Throwable $th) {}
-
-    \CodeIgniter\Config\Services::reset(true);
-    
-    UploadedFileBridge::reset();
-
-    if(env("CIROAD_DB_AUTOCLOSE")){
-        HandleDBConnection::closeConnect();
+    } catch (\Throwable $th) {
     }
 
-    $appConfig = config(\Config\App::class);
-    $app       = new \CodeIgniter\CodeIgniter($appConfig);
-    $app->initialize();
+    \CodeIgniter\Config\Services::reset(true);
+
+    UploadedFileBridge::reset();
+
+    if (env("CIROAD_DB_AUTOCLOSE")) {
+        HandleDBConnection::closeConnect();
+    }
 }
