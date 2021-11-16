@@ -33,6 +33,7 @@ $psrFactory = new Psr7\Factory\Psr17Factory();
 $psr7 = new RoadRunner\Http\PSR7Worker($worker, $psrFactory, $psrFactory, $psrFactory);
 
 while (true) {
+    //get psr7 request
     try {
         $request = $psr7->waitRequest();
         if (!($request instanceof \Psr\Http\Message\ServerRequestInterface)) { // Termination request received
@@ -51,28 +52,46 @@ while (true) {
         var_dump((string)$e);
         $psr7->getWorker()->error((string)$e);
     }
-    //run framework and error handling
-    $app->setRequest($ci4Request)->run();
-    $ci4Response = \CodeIgniter\Config\Services::response();
-    
-    // dump(\CodeIgniter\Config\Services::response());
-    // var_dump(\CodeIgniter\Config\Services::response());
-    // try {
-    //     if (!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
-    //     $ci4Response = $app->run();
-    // } catch (\Throwable $e) {
-    //     dump($e);
-    //     $exception = new Exceptions($request);
-    //     $response = $exception->exceptionHandler($e);
-    //     $psr7->respond($response);
-    //     refreshCodeIgniter4();
-    //     continue;
-    // }
 
+    //handle debug-bar
+    try {
+        if (ENVIRONMENT === 'development') {
+            $toolbar = new Toolbar(config('Toolbar'), $ci4Request);
+            if ($barResponse = $toolbar->respond()) {
+                $psr7->respond($barResponse);
+                refreshCodeIgniter4();
+                unset($app);
+                continue;
+            }
+        }
+    } catch (\Throwable $e) {
+        // $psr7->getWorker()->error((string)$e);
+    }
+    
+    //run framework and error handling
+    try {
+        if (!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
+        $appConfig = config(\Config\App::class);
+        $app       = new \CodeIgniter\CodeIgniter($appConfig);
+        $app->initialize();
+        $app->setRequest($ci4Request)->run();
+        $ci4Response = \CodeIgniter\Config\Services::response();
+    } catch (\Throwable $e) {
+        $exception = new Exceptions($request);
+        $response = $exception->exceptionHandler($e);
+        $psr7->respond($response);
+        refreshCodeIgniter4();
+        unset($app);
+        continue;
+    }
+
+    //handle response object
     try {
         // Application code logic
-        $psr7->respond(new Psr7\Response(200, [], $ci4Response->getBody()));
+        $response = new ResponseBridge($ci4Response, $request);
+        $psr7->respond($response);
         refreshCodeIgniter4();
+        unset($app);
     } catch (\Exception $e) {
         $psr7->respond(new Psr7\Response(500, [], 'Something Went Wrong!'));
     }
@@ -94,8 +113,4 @@ function refreshCodeIgniter4()
     if(env("CIROAD_DB_AUTOCLOSE")){
         HandleDBConnection::closeConnect();
     }
-
-    $appConfig = config(\Config\App::class);
-    $app       = new \CodeIgniter\CodeIgniter($appConfig);
-    $app->initialize();
 }

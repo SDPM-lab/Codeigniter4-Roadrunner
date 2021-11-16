@@ -9,7 +9,8 @@
         "codeigniter4/framework": "^4",
         "spiral/roadrunner": "^2",
         "nyholm/psr7": "^1.4",
-        "spiral/dumper": "^2.8"
+        "spiral/dumper": "^2.8",
+        "laminas/laminas-diactoros": "^2.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",

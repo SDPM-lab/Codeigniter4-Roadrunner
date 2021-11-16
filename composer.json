@@ -10,6 +10,10 @@
     "license": "MIT",
     "authors": [
         {
+            "name": "MonkenWu",
+            "homepage": "https://github.com/monkenWu"
+        },
+        {
             "name": "SDPM-lab",
             "homepage": "https://github.com/SDPM-lab"
         }
@@ -19,8 +23,8 @@
         "php" : "^7.3",
         "codeigniter4/framework": "^4.1.5",
         "spiral/roadrunner": "^2",
-        "spiral/dumper": "^1.1",
-        "laminas/laminas-diactoros": "^2.8.0"
+        "spiral/dumper": "^2.8",
+        "laminas/laminas-diactoros": "^2.8"
     },
     "autoload": {
 		"psr-4": {
