@@ -56,6 +56,7 @@ while (true) {
     //handle debug-bar
     try {
         if (ENVIRONMENT === 'development') {
+            \Kint\Kint::$mode_default_cli = null;
             $toolbar = new Toolbar(config('Toolbar'), $ci4Request);
             if ($barResponse = $toolbar->respond()) {
                 $psr7->respond($barResponse);
@@ -65,7 +66,7 @@ while (true) {
             }
         }
     } catch (\Throwable $e) {
-        // $psr7->getWorker()->error((string)$e);
+        $psr7->getWorker()->error((string)$e);
     }
     
     //run framework and error handling

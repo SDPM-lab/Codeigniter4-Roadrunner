@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb51437b20806897e7c6c994bb8db6a4",
+    "content-hash": "72a120f8f42df1a68ede3dce4e3f9ac7",
     "packages": [
         {
             "name": "codedungeon/php-cli-colors",
