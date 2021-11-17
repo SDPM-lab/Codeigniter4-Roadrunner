@@ -17,6 +17,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 2. Composer
 3. Enable `php-curl` extension
 4. Enable `php-zip` extension
+4. Enable `php-sockets` extension
 
 ### Composer Install
 Use "Composer" to download the library and its dependencies to the project
@@ -33,32 +34,47 @@ php spark ciroad:init
 Run the command in the root directory of your project:
 1. Use Codeigniter4 spark command
   ```
-  php spark ciroad:start -v -d
+  php spark ciroad:start -d
   ```
 2. Use Roadrunner command in Windows
   ```
-  rr.exe serve -v -d
+  rr.exe serve -d
   ```
 3. Use Roadrunner command in MacOS/Linux
   ```
-  ./rr serve -v -d
+  ./rr serve -d
   ```
 
 ## Server Settings
 The server settings are all in the project root directory ".rr.yaml". The default file will look like this:
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    # pool:
-    #   numWorkers: 50
-    #   maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+  # env:
+  #   XDEBUG_SESSION: 1
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
+
+# reload:
+#   interval: 1s
+#   patterns: [ ".php" ]
+#   services:
+#     http:
+#       recursive: true
+#       ignore: [ "vendor" ]
+#       patterns: [ ".php", ".go", ".md" ]
+#       dirs: [ "." ]
 ```
 You can create your configuration file according to the [Roadrunner document](https://roadrunner.dev/docs/intro-config).
 
@@ -69,16 +85,19 @@ You can create your configuration file according to the [Roadrunner document](ht
 In the default circumstance of RoadRunner, you must restart the server everytime after you revised any PHP files so that your revision will effective.
 It seems not that friendly during development.
 
-You can revise your `.rr.yaml` configuration file, add the settings below and start the development mode with `-v -d`.
+You can revise your `.rr.yaml` configuration file, add the settings below and start the development mode with `-d`.
 RoadRunner Server will detect if the PHP files were revised or not, automatically, and reload the Worker instantly.
 
 ```yaml
-# reload can reset rr servers when files change
 reload:
-  #refresh interval (default 1s)
   interval: 1s
-  #file extensions to watch, defaults to [.php]
-  patterns: [".php"]
+  patterns: [ ".php" ]
+  services:
+    http:
+      recursive: true
+      ignore: [ "vendor" ]
+      patterns: [ ".php", ".go", ".md" ]
+      dirs: [ "." ]
 ```
 
 The `reload` function is very resource-intensive, please do not activate the option in the formal environment.
@@ -168,67 +187,60 @@ Since the RoadRunner Worker can not transfer the correct `$_FILES` context, the 
 You can fetch the uploaded files by means of `SDPMlab\Ci4Roadrunner\UploadedFileBridge::getPsr7UploadedFiles()` in the controller (or any other places). This method will return an array, consist of Uploaded File objects. The available methods of this object is identical as the regulation of [PSR-7 Uploaded File Interface](https://www.php-fig.org/psr/psr-7/#36-psrhttpmessageuploadedfileinterface).
 
 ```php
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
-	use ResponseTrait;
+    use ResponseTrait;
 
-	protected $format = "json";
-	/**
-	 * form-data 
-	 */
-	public function fileUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles();
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    protected $format = "json";
 
-	/**
-	 * form-data multiple upload
-	 */
-	public function fileMultipleUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    /**
+     * form-data 
+     */
+    public function fileUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles();
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+
+    /**
+     * form-data multiple upload
+     */
+    public function fileMultipleUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+}
 ```
 
 ### Dealing with thrown errors
 
-If you encountered some variables or object content that needed to be confirmed in `-v -d` development mode, you can use the global function `dump()` to throw errors onto the terminal no matter where the program is.
-
-```php
- /**
-  * Dump given value into target output.
-  *
-  * @param mixed $value Variable
-  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
-  * @return string|null
-  */
-function dump($value,string $target = "ERROR_LOG") : ?string;
-```
+If you encountered some variables or object content that needed to be confirmed in `-d` development mode, you can use the global function `dump()` to throw errors onto the terminal no matter where the program is.
 
 ## Avaliable commands
 
@@ -241,50 +253,6 @@ Initiallize RoadRunner and its needed files.
     $ php spark ciroad:init
     ```
 
-### ciroad:start
+### RoadRunner Server Commands
 
-Start RoadRunner Server
-
-* Use
-    ```
-    $ php spark ciroad:start [Options]
-    ```
-
-* Options:
-    ```
-    -d      During debugging mode, HTTP requests details will be listed on the terminal
-    -b      run in the background
-    -v      output details
-    ```
-
-### ciroad:stop
-
-Kill the RoadRunner running in the background.
-
-* Use
-    ```
-    $ php spark ciroad:stop
-    ```
-
-### ciroad:reset
-
-Force reload all the HTTP Workers.
-
-* Use
-    ```
-    $ php spark ciroad:reset
-    ```
-
-### ciroad:status
-
-Check the current Worker operating status
-
-* Use
-    ```
-    $ php spark ciroad:status [Options]
-    ```
-
-* Options:
-    ```
-    -i      output status continuously per second
-    ```
+For the available commands, you can refer to the instructions in the RoadRunner [official document](https://roadrunner.dev/docs/beep-beep-cli) .

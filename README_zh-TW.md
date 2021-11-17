@@ -11,10 +11,11 @@ Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Requ
 ## 安裝
 
 ### 需求
-1. CodeIgniter Framework 4.1.1 以上
+1. CodeIgniter Framework 4.1.5 以上
 2. Composer
 3. 安裝並開啟 php-curl 擴充套件
 4. 安裝並開啟 php-zip 擴充套件
+5. 安裝並開啟 php-sockets 擴充套件
 
 ### Composer 安裝
 
@@ -34,17 +35,13 @@ php spark ciroad:init
 
 你可以選擇使用不同的指令在專案根目錄中運作 RoadRunner Server：
 
-1. 使用 Codeigniter4 spark 指令
+1. 在 Windows-cmd 中直使用 RoadRunner 指令
   ```
-  php spark ciroad:start -v -d
-  ```
-2. 在 Windows-cmd 中直使用 RoadRunner 指令
-  ```
-  rr.exe serve -v -d
+  rr.exe serve -d
   ```
 3. 在 MacOS/Linux 中直接使用 RoadRunner 指令
   ```
-  ./rr serve -v -d
+  ./rr serve -d
   ```
 
 ## 伺服器組態設定
@@ -52,18 +49,33 @@ php spark ciroad:init
 伺服器組態設定應置於專案根目錄下，並命名為 `.rr.yaml` 。程式庫初始化後產出的預設檔案看起來會像這樣子：
 
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    # pool:
-    #   numWorkers: 50
-    #   maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+  # env:
+  #   XDEBUG_SESSION: 1
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
+
+# reload:
+#   interval: 1s
+#   patterns: [ ".php" ]
+#   services:
+#     http:
+#       recursive: true
+#       ignore: [ "vendor" ]
+#       patterns: [ ".php", ".go", ".md" ]
+#       dirs: [ "." ]
 ```
 
 當然，你可以參考 [Roadrunner 手冊](https://roadrunner.dev/docs/intro-config) 建立符合專案需求的組態設定檔。
@@ -74,15 +86,18 @@ static:
 
 RoadRunner 預設的情況下，必須在每次修改 php 檔案後重啟伺服器，你所做的修改才會生效，這在開發上似乎不那麼友善。
 
-你可以修改你的 `.rr.yaml` 組態設定檔案，加入以下設定後以 `-v -d` 開發模式啟動 RoadRunner Server，它將會自動偵測 PHP 檔案是否修改，並即時重新載入 Worker 。
+你可以修改你的 `.rr.yaml` 組態設定檔案，加入以下設定後以 `-d` 開發模式啟動 RoadRunner Server，它將會自動偵測 PHP 檔案是否修改，並即時重新載入 Worker 。
 
 ```yaml
-# reload can reset rr servers when files change
 reload:
-  # refresh interval (default 1s)
   interval: 1s
-  # file extensions to watch, defaults to [.php]
-  patterns: [".php"]
+  patterns: [ ".php" ]
+  services:
+    http:
+      recursive: true
+      ignore: [ "vendor" ]
+      patterns: [ ".php", ".go", ".md" ]
+      dirs: [ "." ]
 ```
 
 `reload` 是非常耗費資源的，請不要在正式環境中打開這個選項。
@@ -168,67 +183,60 @@ CIROAD_DB_AUTOCLOSE = true
 你可以在控制器（或任何地方），以 `SDPMlab\Ci4Roadrunner\UploadedFileBridge::getPsr7UploadedFiles()` 取得使用者上傳的檔案。這個方法將回傳以 Uploaded File 物件組成的陣列。此物件可用的方法與 [PSR-7 Uploaded File Interface](https://www.php-fig.org/psr/psr-7/#36-psrhttpmessageuploadedfileinterface) 中規範的一樣。
 
 ```php
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
-	use ResponseTrait;
+    use ResponseTrait;
 
-	protected $format = "json";
-	/**
-	 * form-data 
-	 */
-	public function fileUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles();
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    protected $format = "json";
 
-	/**
-	 * form-data multiple upload
-	 */
-	public function fileMultipleUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    /**
+     * form-data 
+     */
+    public function fileUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles();
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+
+    /**
+     * form-data multiple upload
+     */
+    public function fileMultipleUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+}
 ```
 
 ### 處理錯誤拋出
 
-如果你在 `-v -d` 開發模式中碰到了一些需要確認的變數、或物件內容，無論在程式的何處，你都可以使用全域函數 `dump()` 來將錯誤拋出到終端機上。
-
-```php
- /**
-  * Dump given value into target output.
-  *
-  * @param mixed $value Variable
-  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
-  * @return string|null
-  */
-function dump($value,string $target = "ERROR_LOG") : ?string;
-```
+如果你在 `-d` 開發模式中碰到了一些需要確認的變數、或物件內容，無論在程式的何處，你都可以使用全域函數 `dump()` 來將錯誤拋出到終端機上。
 
 ## 可用指令
 
@@ -241,50 +249,6 @@ function dump($value,string $target = "ERROR_LOG") : ?string;
     $ php spark ciroad:init
     ```
 
-### ciroad:start
+### RoadRunner Server Commands
 
-啟動 RoadRunner 伺服器。
-
-* Use
-    ```
-    $ php spark ciroad:start [Options]
-    ```
-
-* Options:
-    ```
-    -d      在除錯模式中執行，HTTP 請求詳情將會羅列在終端機。
-    -b      在背景中執行。
-    -v      輸出詳細資料。
-    ```
-
-### ciroad:stop
-
-停止在背景運作的 RoadRunner 伺服器。
-
-* Use
-    ```
-    $ php spark ciroad:stop
-    ```
-
-### ciroad:reset
-
-強制重新載入所有 HTTP Worker。
-
-* Use
-    ```
-    $ php spark ciroad:reset
-    ```
-
-### ciroad:status
-
-查閱目前 Worker 運作狀態。
-
-* Use
-    ```
-    $ php spark ciroad:status [Options]
-    ```
-
-* Options:
-    ```
-    -i      每秒持續輸出狀態。
-    ```
+關於可以用的指令，你可以參考 RoadRunner [官方文件](https://roadrunner.dev/docs/beep-beep-cli) 的說明。
