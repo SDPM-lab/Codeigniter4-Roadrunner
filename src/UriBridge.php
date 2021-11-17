@@ -19,7 +19,6 @@ class UriBridge
 
         if($rPath == "/"){
             \CodeIgniter\Config\Services::request()->setPath($rPath);
-            // \CodeIgniter\Config\Services::uri()->setPath($rPath);
             return;
         }
 
@@ -33,7 +32,6 @@ class UriBridge
             array_values($pathArr);
         }
         $path = "/".implode("/",$pathArr);
-        // \CodeIgniter\Config\Services::uri()->setPath($path);
         \CodeIgniter\Config\Services::request()->setPath($path);
     }
 
