@@ -32,11 +32,7 @@ php spark ciroad:init
 
 ## Run
 Run the command in the root directory of your project:
-1. Use Codeigniter4 spark command
-  ```
-  php spark ciroad:start -d
-  ```
-2. Use Roadrunner command in Windows
+1. Use Roadrunner command in Windows
   ```
   rr.exe serve -d
   ```
