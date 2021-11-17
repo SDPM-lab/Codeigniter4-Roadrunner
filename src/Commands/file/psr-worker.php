@@ -56,8 +56,9 @@ while (true) {
         if (ENVIRONMENT === 'development') {
             \Kint\Kint::$mode_default_cli = null;
             $toolbar = new Toolbar(config('Toolbar'), $ci4Request);
-            if ($barResponse = $toolbar->respond()) {
-                $psr7->respond($barResponse);
+            if ($ci4BarResponse = $toolbar->respond()) {
+                $response = new ResponseBridge($ci4BarResponse, $request);
+                $psr7->respond($response);
                 refreshCodeIgniter4();
                 unset($app);
                 continue;

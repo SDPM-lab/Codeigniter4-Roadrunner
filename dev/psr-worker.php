@@ -56,8 +56,9 @@ while (true) {
         if (ENVIRONMENT === 'development') {
             \Kint\Kint::$mode_default_cli = null;
             $toolbar = new Toolbar(config('Toolbar'), $ci4Request);
-            if ($barResponse = $toolbar->respond()) {
-                $psr7->respond($barResponse);
+            if ($ci4BarResponse = $toolbar->respond()) {
+                $response = new ResponseBridge($ci4BarResponse, $request);
+                $psr7->respond($response);
                 refreshCodeIgniter4();
                 unset($app);
                 continue;
@@ -66,7 +67,7 @@ while (true) {
     } catch (\Throwable $e) {
         $psr7->getWorker()->error((string)$e);
     }
-    
+
     //run framework and error handling
     try {
         if (!env("CIROAD_DB_AUTOCLOSE")) HandleDBConnection::reconnect();
@@ -103,13 +104,14 @@ function refreshCodeIgniter4()
     fclose($input);
     try {
         ob_end_clean();
-    } catch (\Throwable $th) {}
+    } catch (\Throwable $th) {
+    }
 
     \CodeIgniter\Config\Services::reset(true);
-    
+
     UploadedFileBridge::reset();
 
-    if(env("CIROAD_DB_AUTOCLOSE")){
+    if (env("CIROAD_DB_AUTOCLOSE")) {
         HandleDBConnection::closeConnect();
     }
 }
