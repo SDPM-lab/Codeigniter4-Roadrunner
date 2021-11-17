@@ -169,51 +169,55 @@ CIROAD_DB_AUTOCLOSE = true
 你可以在控制器（或任何地方），以 `SDPMlab\Ci4Roadrunner\UploadedFileBridge::getPsr7UploadedFiles()` 取得使用者上傳的檔案。這個方法將回傳以 Uploaded File 物件組成的陣列。此物件可用的方法與 [PSR-7 Uploaded File Interface](https://www.php-fig.org/psr/psr-7/#36-psrhttpmessageuploadedfileinterface) 中規範的一樣。
 
 ```php
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
-	use ResponseTrait;
+    use ResponseTrait;
 
-	protected $format = "json";
-	/**
-	 * form-data 
-	 */
-	public function fileUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles();
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    protected $format = "json";
 
-	/**
-	 * form-data multiple upload
-	 */
-	public function fileMultipleUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    /**
+     * form-data 
+     */
+    public function fileUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles();
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+
+    /**
+     * form-data multiple upload
+     */
+    public function fileMultipleUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+}
 ```
 
 ### 處理錯誤拋出

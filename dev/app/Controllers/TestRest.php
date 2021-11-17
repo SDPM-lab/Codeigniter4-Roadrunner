@@ -1,20 +1,24 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 
 class TestRest extends ResourceController
 {
-    
+
     protected $format    = 'json';
 
-    public function index(){
+    public function index()
+    {
         return $this->respond([
             "status" => true,
             "msg" => "index method successful."
         ]);
     }
 
-    public function show($id = null){
+    public function show($id = null)
+    {
         return $this->respond([
             "status" => true,
             "id" => $id,
@@ -22,10 +26,11 @@ class TestRest extends ResourceController
         ]);
     }
 
-    public function create(){
+    public function create()
+    {
         $data = $this->request->getJSON(true);
-        if($data == null){
-            return $this->failValidationError("data not found",400);
+        if ($data == null) {
+            return $this->failValidationError("data not found", 400);
         }
         return $this->respondCreated([
             "status" => true,
@@ -34,7 +39,8 @@ class TestRest extends ResourceController
         ]);
     }
 
-    public function update($id = null){
+    public function update($id = null)
+    {
         $data = $this->request->getJSON(true);
         return $this->respond([
             "status" => true,
@@ -44,20 +50,22 @@ class TestRest extends ResourceController
         ]);
     }
 
-    public function new(){
+    public function new()
+    {
         return "newView";
     }
 
-    public function edit($id = null){
-        return $id."editView";
+    public function edit($id = null)
+    {
+        return $id . "editView";
     }
 
-    public function delete($id = null){
+    public function delete($id = null)
+    {
         return $this->respondDeleted([
             "status" => true,
             "id" => $id,
             "msg" => "delede method successful."
         ]);
     }
-
 }

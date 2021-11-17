@@ -1,4 +1,6 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
 
@@ -27,11 +29,11 @@ class SessionTest extends BaseController
 	 */
 	public function createdSession()
 	{
-		if($data = $this->request->getPost("text")){
-			$this->_session->set("text",$data);
-			return $this->respondCreated([]);	
-		}else{
-			return $this->failServerError("Post Data Note Found",400);
+		if ($data = $this->request->getPost("text")) {
+			$this->_session->set("text", $data);
+			return $this->respondCreated([]);
+		} else {
+			return $this->failServerError("Post Data Note Found", 400);
 		}
 	}
 
@@ -41,11 +43,10 @@ class SessionTest extends BaseController
 	 */
 	public function getSessionText()
 	{
-		if($text = $this->_session->get("text")){
-			return $this->respond(["text" => $text],200);
-		}else{
+		if ($text = $this->_session->get("text")) {
+			return $this->respond(["text" => $text], 200);
+		} else {
 			return $this->failNotFound();
 		}
 	}
-
 }

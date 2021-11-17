@@ -169,51 +169,55 @@ Since the RoadRunner Worker can not transfer the correct `$_FILES` context, the 
 You can fetch the uploaded files by means of `SDPMlab\Ci4Roadrunner\UploadedFileBridge::getPsr7UploadedFiles()` in the controller (or any other places). This method will return an array, consist of Uploaded File objects. The available methods of this object is identical as the regulation of [PSR-7 Uploaded File Interface](https://www.php-fig.org/psr/psr-7/#36-psrhttpmessageuploadedfileinterface).
 
 ```php
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use CodeIgniter\API\ResponseTrait;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 class FileUploadTest extends BaseController
 {
-	use ResponseTrait;
+    use ResponseTrait;
 
-	protected $format = "json";
-	/**
-	 * form-data 
-	 */
-	public function fileUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles();
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    protected $format = "json";
 
-	/**
-	 * form-data multiple upload
-	 */
-	public function fileMultipleUpload(){
-		$files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
-		$data = [];
-		foreach ($files as $file) {
-			$fileEx = array_pop(
-				explode('.', $file->getClientFilename())
-			);
-			$newFileName = uniqid(rand()).".".$fileEx;
-			$newFilePath = WRITEPATH.'uploads'.DIRECTORY_SEPARATOR.$newFileName;
-			$file->moveTo($newFilePath);
-			$data[$file->getClientFilename()] = md5_file($newFilePath);
-		}
-		return $this->respondCreated($data);	
-	}
+    /**
+     * form-data 
+     */
+    public function fileUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles();
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+
+    /**
+     * form-data multiple upload
+     */
+    public function fileMultipleUpload()
+    {
+        $files = UploadedFileBridge::getPsr7UploadedFiles()["data"];
+        $data = [];
+        foreach ($files as $file) {
+            $fileNameArr = explode('.', $file->getClientFilename());
+            $fileEx = array_pop($fileNameArr);
+            $newFileName = uniqid(rand()) . "." . $fileEx;
+            $newFilePath = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . $newFileName;
+            $file->moveTo($newFilePath);
+            $data[$file->getClientFilename()] = md5_file($newFilePath);
+        }
+        return $this->respondCreated($data);
+    }
+}
 ```
 
 ### Dealing with thrown errors
