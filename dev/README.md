@@ -54,7 +54,7 @@ Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to p
 Next, you have to open a terminal and cd to the root directory, type the commands below to run the Roadrunner server:
 
 ```
-php spark ciroad:start -v -d
+rr serve -d
 ```
 
 Finally, open another new terminal and cd to the test project, type the commands below to run tests:

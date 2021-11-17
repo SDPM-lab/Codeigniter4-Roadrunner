@@ -35,17 +35,13 @@ php spark ciroad:init
 
 你可以選擇使用不同的指令在專案根目錄中運作 RoadRunner Server：
 
-1. 使用 Codeigniter4 spark 指令
+1. 在 Windows-cmd 中直使用 RoadRunner 指令
   ```
-  php spark ciroad:start -v -d
-  ```
-2. 在 Windows-cmd 中直使用 RoadRunner 指令
-  ```
-  rr.exe serve -v -d
+  rr.exe serve -d
   ```
 3. 在 MacOS/Linux 中直接使用 RoadRunner 指令
   ```
-  ./rr serve -v -d
+  ./rr serve -d
   ```
 
 ## 伺服器組態設定
@@ -90,7 +86,7 @@ http:
 
 RoadRunner 預設的情況下，必須在每次修改 php 檔案後重啟伺服器，你所做的修改才會生效，這在開發上似乎不那麼友善。
 
-你可以修改你的 `.rr.yaml` 組態設定檔案，加入以下設定後以 `-v -d` 開發模式啟動 RoadRunner Server，它將會自動偵測 PHP 檔案是否修改，並即時重新載入 Worker 。
+你可以修改你的 `.rr.yaml` 組態設定檔案，加入以下設定後以 `-d` 開發模式啟動 RoadRunner Server，它將會自動偵測 PHP 檔案是否修改，並即時重新載入 Worker 。
 
 ```yaml
 reload:
@@ -240,7 +236,7 @@ class FileUploadTest extends BaseController
 
 ### 處理錯誤拋出
 
-如果你在 `-v -d` 開發模式中碰到了一些需要確認的變數、或物件內容，無論在程式的何處，你都可以使用全域函數 `dump()` 來將錯誤拋出到終端機上。
+如果你在 `-d` 開發模式中碰到了一些需要確認的變數、或物件內容，無論在程式的何處，你都可以使用全域函數 `dump()` 來將錯誤拋出到終端機上。
 
 ## 可用指令
 
@@ -253,50 +249,6 @@ class FileUploadTest extends BaseController
     $ php spark ciroad:init
     ```
 
-### ciroad:start
+### RoadRunner Server Commands
 
-啟動 RoadRunner 伺服器。
-
-* Use
-    ```
-    $ php spark ciroad:start [Options]
-    ```
-
-* Options:
-    ```
-    -d      在除錯模式中執行，HTTP 請求詳情將會羅列在終端機。
-    -b      在背景中執行。
-    -v      輸出詳細資料。
-    ```
-
-### ciroad:stop
-
-停止在背景運作的 RoadRunner 伺服器。
-
-* Use
-    ```
-    $ php spark ciroad:stop
-    ```
-
-### ciroad:reset
-
-強制重新載入所有 HTTP Worker。
-
-* Use
-    ```
-    $ php spark ciroad:reset
-    ```
-
-### ciroad:status
-
-查閱目前 Worker 運作狀態。
-
-* Use
-    ```
-    $ php spark ciroad:status [Options]
-    ```
-
-* Options:
-    ```
-    -i      每秒持續輸出狀態。
-    ```
+關於可以用的指令，你可以參考 RoadRunner [官方文件](https://roadrunner.dev/docs/beep-beep-cli) 的說明。

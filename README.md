@@ -34,15 +34,15 @@ php spark ciroad:init
 Run the command in the root directory of your project:
 1. Use Codeigniter4 spark command
   ```
-  php spark ciroad:start -v -d
+  php spark ciroad:start -d
   ```
 2. Use Roadrunner command in Windows
   ```
-  rr.exe serve -v -d
+  rr.exe serve -d
   ```
 3. Use Roadrunner command in MacOS/Linux
   ```
-  ./rr serve -v -d
+  ./rr serve -d
   ```
 
 ## Server Settings
@@ -85,7 +85,7 @@ You can create your configuration file according to the [Roadrunner document](ht
 In the default circumstance of RoadRunner, you must restart the server everytime after you revised any PHP files so that your revision will effective.
 It seems not that friendly during development.
 
-You can revise your `.rr.yaml` configuration file, add the settings below and start the development mode with `-v -d`.
+You can revise your `.rr.yaml` configuration file, add the settings below and start the development mode with `-d`.
 RoadRunner Server will detect if the PHP files were revised or not, automatically, and reload the Worker instantly.
 
 ```yaml
@@ -240,7 +240,7 @@ class FileUploadTest extends BaseController
 
 ### Dealing with thrown errors
 
-If you encountered some variables or object content that needed to be confirmed in `-v -d` development mode, you can use the global function `dump()` to throw errors onto the terminal no matter where the program is.
+If you encountered some variables or object content that needed to be confirmed in `-d` development mode, you can use the global function `dump()` to throw errors onto the terminal no matter where the program is.
 
 ## Avaliable commands
 
@@ -253,50 +253,6 @@ Initiallize RoadRunner and its needed files.
     $ php spark ciroad:init
     ```
 
-### ciroad:start
+### RoadRunner Server Commands
 
-Start RoadRunner Server
-
-* Use
-    ```
-    $ php spark ciroad:start [Options]
-    ```
-
-* Options:
-    ```
-    -d      During debugging mode, HTTP requests details will be listed on the terminal
-    -b      run in the background
-    -v      output details
-    ```
-
-### ciroad:stop
-
-Kill the RoadRunner running in the background.
-
-* Use
-    ```
-    $ php spark ciroad:stop
-    ```
-
-### ciroad:reset
-
-Force reload all the HTTP Workers.
-
-* Use
-    ```
-    $ php spark ciroad:reset
-    ```
-
-### ciroad:status
-
-Check the current Worker operating status
-
-* Use
-    ```
-    $ php spark ciroad:status [Options]
-    ```
-
-* Options:
-    ```
-    -i      output status continuously per second
-    ```
+For the available commands, you can refer to the instructions in the RoadRunner [official document](https://roadrunner.dev/docs/beep-beep-cli) .
