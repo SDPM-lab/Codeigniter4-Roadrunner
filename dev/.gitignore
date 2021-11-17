@@ -126,3 +126,5 @@ nb-configuration.xml
 /.phpunit.*.cache
 
 rr.exe
+.rr.yaml
+psr-worker.php

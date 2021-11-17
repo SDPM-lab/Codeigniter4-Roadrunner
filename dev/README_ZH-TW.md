@@ -15,7 +15,7 @@
 
 ## 要求
 
-建議使用最新版本的 PHPUnit。在撰寫本文時，我們正在運作的是版本 `8.5.8` 。你可能需要先使用 Composer 將專案所需的程式庫下載回你的開發環境。
+建議使用最新版本的 PHPUnit。在撰寫本文時，我們正在運作的是版本 `9.5.10` 。你可能需要先使用 Composer 將專案所需的程式庫下載回你的開發環境。
 
 ```
 composer install
@@ -34,18 +34,19 @@ php spark ciroad:init
 在運作測試前，請先打開 `.rr.yaml` 檔案，並確保這個設定檔案具有以下設定：
 
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    pool:
-      numWorkers: 1
-    #  maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1  
 ```
 
 因為 Roadrunner-Worker 持久化於記憶體中，HTTP 的請求會重複利用到這些 Worker 進行處裡。所以我們必須要在只有單個 Worker 的情況下測試是否穩定，以證明在多個 Woker 的實際環境中能正常運作。 

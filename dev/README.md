@@ -15,7 +15,7 @@ This test case takes the acutal sent CURL Request as test approach, because what
 
 ## Requirements
 
-We recommend you to use the latest PHPUnit. While we're writing scripts, the version we're running at is version `8.5.8`. You might need to use Composer to download the library your project needed back to your develop environment.
+We recommend you to use the latest PHPUnit. While we're writing scripts, the version we're running at is version `9.5.10`. You might need to use Composer to download the library your project needed back to your develop environment.
 
 ```
 composer install
@@ -34,18 +34,19 @@ Finally, please confirm if the directory has these threee files including `rr`(i
 Before running tests, please open `rr.yaml` file first, and ensure this configuration file has these settings:
 
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    pool:
-      numWorkers: 1
-    #  maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1  
 ```
 
 Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to process. Hence we need to test the stability under the environment with only one worker to prove that it can work properly under several workers.

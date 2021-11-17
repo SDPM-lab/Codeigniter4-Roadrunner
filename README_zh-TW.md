@@ -53,18 +53,33 @@ php spark ciroad:init
 伺服器組態設定應置於專案根目錄下，並命名為 `.rr.yaml` 。程式庫初始化後產出的預設檔案看起來會像這樣子：
 
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    # pool:
-    #   numWorkers: 50
-    #   maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+  # env:
+  #   XDEBUG_SESSION: 1
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
+
+# reload:
+#   interval: 1s
+#   patterns: [ ".php" ]
+#   services:
+#     http:
+#       recursive: true
+#       ignore: [ "vendor" ]
+#       patterns: [ ".php", ".go", ".md" ]
+#       dirs: [ "." ]
 ```
 
 當然，你可以參考 [Roadrunner 手冊](https://roadrunner.dev/docs/intro-config) 建立符合專案需求的組態設定檔。
@@ -78,12 +93,15 @@ RoadRunner 預設的情況下，必須在每次修改 php 檔案後重啟伺服�
 你可以修改你的 `.rr.yaml` 組態設定檔案，加入以下設定後以 `-v -d` 開發模式啟動 RoadRunner Server，它將會自動偵測 PHP 檔案是否修改，並即時重新載入 Worker 。
 
 ```yaml
-# reload can reset rr servers when files change
 reload:
-  # refresh interval (default 1s)
   interval: 1s
-  # file extensions to watch, defaults to [.php]
-  patterns: [".php"]
+  patterns: [ ".php" ]
+  services:
+    http:
+      recursive: true
+      ignore: [ "vendor" ]
+      patterns: [ ".php", ".go", ".md" ]
+      dirs: [ "." ]
 ```
 
 `reload` 是非常耗費資源的，請不要在正式環境中打開這個選項。
@@ -223,17 +241,6 @@ class FileUploadTest extends BaseController
 ### 處理錯誤拋出
 
 如果你在 `-v -d` 開發模式中碰到了一些需要確認的變數、或物件內容，無論在程式的何處，你都可以使用全域函數 `dump()` 來將錯誤拋出到終端機上。
-
-```php
- /**
-  * Dump given value into target output.
-  *
-  * @param mixed $value Variable
-  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
-  * @return string|null
-  */
-function dump($value,string $target = "ERROR_LOG") : ?string;
-```
 
 ## 可用指令
 

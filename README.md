@@ -48,18 +48,33 @@ Run the command in the root directory of your project:
 ## Server Settings
 The server settings are all in the project root directory ".rr.yaml". The default file will look like this:
 ```yaml
-http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    # pool:
-    #   numWorkers: 50
-    #   maxJobs:  500
+rpc:
+  listen: tcp://127.0.0.1:6001
 
-static:
-  enable:  true
-  dir:   "public"
-  forbid: [".php", ".htaccess"]
+server:
+  command: "php psr-worker.php"
+  # env:
+  #   XDEBUG_SESSION: 1
+
+http:
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
+
+# reload:
+#   interval: 1s
+#   patterns: [ ".php" ]
+#   services:
+#     http:
+#       recursive: true
+#       ignore: [ "vendor" ]
+#       patterns: [ ".php", ".go", ".md" ]
+#       dirs: [ "." ]
 ```
 You can create your configuration file according to the [Roadrunner document](https://roadrunner.dev/docs/intro-config).
 
@@ -74,12 +89,15 @@ You can revise your `.rr.yaml` configuration file, add the settings below and st
 RoadRunner Server will detect if the PHP files were revised or not, automatically, and reload the Worker instantly.
 
 ```yaml
-# reload can reset rr servers when files change
 reload:
-  #refresh interval (default 1s)
   interval: 1s
-  #file extensions to watch, defaults to [.php]
-  patterns: [".php"]
+  patterns: [ ".php" ]
+  services:
+    http:
+      recursive: true
+      ignore: [ "vendor" ]
+      patterns: [ ".php", ".go", ".md" ]
+      dirs: [ "." ]
 ```
 
 The `reload` function is very resource-intensive, please do not activate the option in the formal environment.
@@ -223,17 +241,6 @@ class FileUploadTest extends BaseController
 ### Dealing with thrown errors
 
 If you encountered some variables or object content that needed to be confirmed in `-v -d` development mode, you can use the global function `dump()` to throw errors onto the terminal no matter where the program is.
-
-```php
- /**
-  * Dump given value into target output.
-  *
-  * @param mixed $value Variable
-  * @param string $target Possible options: OUTPUT, RETURN, ERROR_LOG, LOGGER.
-  * @return string|null
-  */
-function dump($value,string $target = "ERROR_LOG") : ?string;
-```
 
 ## Avaliable commands
 
