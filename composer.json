@@ -24,7 +24,8 @@
         "codeigniter4/framework": "^4.1.5",
         "spiral/roadrunner": "^2",
         "spiral/dumper": "^2.8",
-        "laminas/laminas-diactoros": "^2.8"
+        "laminas/laminas-diactoros": "^2.8",
+        "nyholm/psr7": "^1.4"
     },
     "autoload": {
 		"psr-4": {
