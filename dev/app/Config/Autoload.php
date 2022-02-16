@@ -41,9 +41,9 @@ class Autoload extends AutoloadConfig
      * @var array<string, string>
      */
     public $psr4 = [
-        APP_NAMESPACE => APPPATH, // For custom app namespace
-        'Config'      => APPPATH . 'Config',
-        "SDPMlab\\Ci4Roadrunner\\" =>  ROOTPATH . ".." . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR,
+        APP_NAMESPACE              => APPPATH, // For custom app namespace
+        'Config'                   => APPPATH . 'Config',
+        'SDPMlab\\Ci4Roadrunner\\' => ROOTPATH . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR,
     ];
 
     /**
