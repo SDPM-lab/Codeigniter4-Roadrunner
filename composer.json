@@ -33,7 +33,7 @@
 		}
 	},
     "require-dev": {
-        "codeigniter4/devkit": "dev-develop"
+        "codeigniter4/devkit": "^1.0"
     },
     "config": {
         "allow-plugins": {
