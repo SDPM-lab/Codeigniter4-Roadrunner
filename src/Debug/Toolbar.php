@@ -28,7 +28,6 @@ use Kint\Kint;
 use Laminas\Diactoros\Stream;
 use Psr\Http\Message\StreamInterface;
 
-
 /**
  * Displays a toolbar with bits of stats to aid a developer in debugging.
  *
@@ -67,12 +66,13 @@ class Toolbar
 
     public function __construct(
         ToolbarConfig $config,
-        \CodeIgniter\HTTP\IncomingRequest $request
+        IncomingRequest $request
     ) {
-        $this->config = $config;
+        $this->config  = $config;
         $this->request = $request;
+
         foreach ($config->collectors as $collector) {
-            if (!class_exists($collector)) {
+            if (! class_exists($collector)) {
                 log_message('critical', 'Toolbar collector does not exists(' . $collector . ').' .
                     'please check $collectors in the Config\Toolbar.php file.');
 
@@ -138,7 +138,7 @@ class Toolbar
             $data['vars']['varData'][esc($heading)] = $varData;
         }
 
-        if (!empty($_SESSION)) {
+        if (! empty($_SESSION)) {
             foreach ($_SESSION as $key => $value) {
                 // Replace the binary data with string to avoid json_encode failure.
                 if (is_string($value) && preg_match('~[^\x20-\x7E\t\r\n]~', $value)) {
@@ -204,8 +204,8 @@ class Toolbar
         $output = '';
 
         foreach ($rows as $row) {
-            $hasChildren = isset($row['children']) && !empty($row['children']);
-            $isQuery     = isset($row['query']) && !empty($row['query']);
+            $hasChildren = isset($row['children']) && ! empty($row['children']);
+            $isQuery     = isset($row['query']) && ! empty($row['query']);
 
             // Open controller timeline by default
             $open = $row['name'] === 'Controller';
@@ -270,7 +270,7 @@ class Toolbar
 
         // Collect it
         foreach ($collectors as $collector) {
-            if (!$collector['hasTimelineData']) {
+            if (! $collector['hasTimelineData']) {
                 continue;
             }
 
@@ -306,7 +306,7 @@ class Toolbar
         $element = array_shift($elements);
 
         // If we have children behind us, collect and attach them to us
-        while (!empty($elements) && $elements[array_key_first($elements)]['end'] <= $element['end']) {
+        while (! empty($elements) && $elements[array_key_first($elements)]['end'] <= $element['end']) {
             $element['children'][] = array_shift($elements);
         }
 
@@ -333,7 +333,7 @@ class Toolbar
         $data = [];
 
         foreach ($this->collectors as $collector) {
-            if (!$collector->hasVarData()) {
+            if (! $collector->hasVarData()) {
                 continue;
             }
 
@@ -367,11 +367,11 @@ class Toolbar
          * @var IncomingRequest $request
          * @var Response        $response
          */
-        if (CI_DEBUG && !is_cli()) {
+        if (CI_DEBUG && ! is_cli()) {
             global $app;
 
-            $request  = $request ?? Services::request();
-            $response = $response ?? Services::response();
+            $request ??= Services::request();
+            $response ??= Services::response();
 
             // Disable the toolbar for downloads
             if ($response instanceof DownloadResponse) {
@@ -392,7 +392,7 @@ class Toolbar
             // Updated to time() so we can get history
             $time = time();
 
-            if (!is_dir(WRITEPATH . 'debugbar')) {
+            if (! is_dir(WRITEPATH . 'debugbar')) {
                 mkdir(WRITEPATH . 'debugbar', 0777);
             }
 
@@ -456,7 +456,8 @@ class Toolbar
             include $this->config->viewsPath . 'toolbarloader.js';
             $output = ob_get_clean();
             $output = str_replace('{url}', rtrim(site_url(), '/'), $output);
-            return $this->getResponse($output, 200, "application/javascript");
+
+            return $this->getResponse($output, 200, 'application/javascript');
         }
 
         // Otherwise, if it includes ?debugbar_time, then
@@ -473,19 +474,20 @@ class Toolbar
 
             if (is_file($filename)) {
                 // Show the toolbar if it exists
-                $contents =  $this->format(file_get_contents($filename), $format);
+                $contents = $this->format(file_get_contents($filename), $format);
+
                 return $this->getResponse($contents, 200, $format);
             }
 
             // Filename not found
-            return $this->getResponse("", 404, "text/html");
+            return $this->getResponse('', 404, 'text/html');
         }
     }
 
-    private function getResponse(string $body, int $code = 200, string $contentType)
+    private function getResponse(string $body, int $code, string $contentType)
     {
         $response = \Config\Services::response();
-        $response->setBody($body)->setStatusCode($code)->setHeader("Content-Type", $contentType);
+        $response->setBody($body)->setStatusCode($code)->setHeader('Content-Type', $contentType);
 
         return $response;
     }
@@ -499,6 +501,7 @@ class Toolbar
         $body = new Stream('php://temp', 'wb+');
         $body->write($html);
         $body->rewind();
+
         return $body;
     }
 

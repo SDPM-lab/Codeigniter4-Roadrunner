@@ -1,11 +1,15 @@
 <?php
+
 namespace SDPMlab\Ci4Roadrunner;
+
+use Throwable;
 
 class HandleDBConnection
 {
     public static function closeConnect()
     {
         $dbInstances = \Config\Database::getConnections();
+
         foreach ($dbInstances as $connection) {
             $connection->close();
         }
@@ -14,18 +18,17 @@ class HandleDBConnection
     public static function reconnect()
     {
         $dbInstances = \Config\Database::getConnections();
+
         foreach ($dbInstances as $connection) {
-            if($connection->DBDriver == "MySQLi"){
+            if ($connection->DBDriver === 'MySQLi') {
                 try {
                     $connection->mysqli->ping();
-                } catch (\Throwable $th) {
+                } catch (Throwable $th) {
                     $connection->reconnect();
                 }
-            }else{
+            } else {
                 $connection->reconnect();
             }
         }
     }
 }
-
-?>
