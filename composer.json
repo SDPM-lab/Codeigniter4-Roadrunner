@@ -19,6 +19,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php" : "^7.3",
         "codeigniter4/framework": "^4.1.5",
