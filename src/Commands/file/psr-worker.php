@@ -102,6 +102,7 @@ while (true) {
         $exception = new Exceptions($request);
         $response  = $exception->exceptionHandler($e);
         $psr7->respond($response);
+
         refreshCodeIgniter4();
         unset($app);
 
