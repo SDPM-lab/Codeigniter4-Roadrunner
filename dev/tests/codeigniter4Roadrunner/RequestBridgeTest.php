@@ -25,7 +25,7 @@ final class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $psrRequest                = ServerRequestFactory::fromGlobals($server);
         RequestHandler::initRequest($psrRequest);
         $ci4Request = Services::request();
-        $this->assertSame('Mozilla', $ci4Request->getUserAgent());
+        $this->assertSame('Mozilla', (string) $ci4Request->getUserAgent());
     }
 
     public function testNegotiatesNot()
@@ -98,7 +98,7 @@ final class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
         $expected  = [
             'username' => 'admin001',
             'role'     => 'administrator',
-            'usepass'  => 0,
+            'usepass'  => '0',
         ];
         $psrRequest = new ServerRequest(
             [],

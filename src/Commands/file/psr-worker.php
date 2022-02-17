@@ -13,9 +13,12 @@ use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 use Spiral\RoadRunner;
 
 // CodeIgniter4 init
-function is_cli(): bool
-{
-    return false;
+// Override is_cli()
+if (! function_exists('is_cli')) {
+    function is_cli(): bool
+    {
+        return false;
+    }
 }
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
 chdir(__DIR__);
