@@ -2,6 +2,7 @@
 
 use CodeIgniter\Test\CIUnitTestCase;
 use Config\Services;
+
 /**
  * @internal
  */

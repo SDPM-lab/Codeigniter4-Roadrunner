@@ -51,6 +51,7 @@ class Toolbar
      * The incoming request.
      */
     protected IncomingRequest $request;
+
     //--------------------------------------------------------------------
     /**
      * The outgoing response.

@@ -1,25 +1,26 @@
 <?php
 
-use Config\Paths;
-use Spiral\RoadRunner\Worker;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Spiral\RoadRunner\Http\PSR7Worker;
-use Psr\Http\Message\ServerRequestInterface;
-use Nyholm\Psr7\Response;
-use Kint\Kint;
-use Config\App;
 use CodeIgniter\CodeIgniter;
 use CodeIgniter\Config\Services;
+use Config\App;
+use Config\Paths;
+use Kint\Kint;
+use Nyholm\Psr7;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface;
+use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
+
 include 'vendor/autoload.php';
 
-use Nyholm\Psr7;
-use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 use SDPMlab\Ci4Roadrunner\RequestHandler;
 use SDPMlab\Ci4Roadrunner\ResponseBridge;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 use Spiral\RoadRunner;
+use Spiral\RoadRunner\Http\PSR7Worker;
+use Spiral\RoadRunner\Worker;
 
 // CodeIgniter4 init
 // Override is_cli()
@@ -70,7 +71,7 @@ while (true) {
     try {
         if (ENVIRONMENT === 'development') {
             Kint::$mode_default_cli = null;
-            $toolbar                      = new Toolbar(config('Toolbar'), $ci4Request);
+            $toolbar                = new Toolbar(config('Toolbar'), $ci4Request);
 
             if ($ci4BarResponse = $toolbar->respond()) {
                 $response = new ResponseBridge($ci4BarResponse, $request);

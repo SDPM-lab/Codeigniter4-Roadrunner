@@ -2,11 +2,11 @@
 
 namespace SDPMlab\Ci4Roadrunner\Debug;
 
+use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\Config\Services;
+use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\Response;
-use CodeIgniter\Config\Services;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Exceptions\PageNotFoundException;
 use Config\Paths;
 use ErrorException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -68,9 +68,9 @@ class Exceptions
     /**
      * Constructor.
      *
-     * @param \Config\Exceptions                $config
-     * @param IncomingRequest $request
-     * @param Response $response
+     * @param \Config\Exceptions $config
+     * @param IncomingRequest    $request
+     * @param Response           $response
      */
     public function __construct(
         ServerRequestInterface $rRequest
