@@ -13,10 +13,8 @@ class UploadedFileBridge
 
     /**
      * PSR-7 UploadedFile Object Array
-     *
-     * @var array
      */
-    private $_psrFiles = [];
+    private array $_psrFiles = [];
 
     public function __construct(
         array $files = [],

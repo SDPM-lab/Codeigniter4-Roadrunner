@@ -1,31 +1,33 @@
 <?php
 
+use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
 /**
  * @internal
  */
-final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
+final class BasicTest extends CIUnitTestCase
 {
     public function testLoadView()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $response = $client->get('/basicTest/loadView');
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testEchoText()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $response = $client->get('/basicTest/echoText');
-        $this->assertTrue($response->getBody() === 'testText');
+        $this->assertSame('testText', $response->getBody());
     }
 
     public function testUrlQuery()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $text1    = uniqid();
@@ -38,12 +40,12 @@ final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
                 'text3' => $text3,
             ],
         ]);
-        $this->assertTrue($response->getBody() === $verify);
+        $this->assertSame($verify, $response->getBody());
     }
 
     public function testFormParams()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $text1    = uniqid();
@@ -56,12 +58,12 @@ final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
                 'text3' => $text3,
             ],
         ]);
-        $this->assertTrue($response->getBody() === $verify);
+        $this->assertSame($verify, $response->getBody());
     }
 
     public function testFormParamsAndQuery()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $text1    = uniqid();
@@ -75,13 +77,13 @@ final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
                 'text2' => $text2,
             ],
         ]);
-        $this->assertTrue($response->getBody() === $verify);
+        $this->assertSame($verify, $response->getBody());
     }
 
     public function testReadHeader()
     {
         for ($i = 0; $i < 2; $i++) {
-            $client = \Config\Services::curlrequest([
+            $client = Services::curlrequest([
                 'base_uri' => 'http://localhost:8080/',
             ], null, null, false);
             $token    = uniqid();
@@ -90,9 +92,9 @@ final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
                     'X-Auth-Token' => $token,
                 ],
             ]);
-            $this->assertTrue($response->getStatusCode() === 200);
+            $this->assertSame(200, $response->getStatusCode());
             $getServerCheckText = json_decode($response->getBody(), true)['X-Auth-Token'];
-            $this->assertTrue($getServerCheckText === $token);
+            $this->assertSame($token, $getServerCheckText);
         }
     }
 
@@ -101,14 +103,14 @@ final class BasicTest extends \CodeIgniter\Test\CIUnitTestCase
         $tokens = [];
 
         for ($i = 0; $i < 2; $i++) {
-            $client = \Config\Services::curlrequest([
+            $client = Services::curlrequest([
                 'base_uri' => 'http://localhost:8080/',
             ], null, null, false);
             $token    = uniqid();
             $response = $client->get('/basicTest/sendHeader');
-            $this->assertTrue($response->getStatusCode() === 200);
+            $this->assertSame(200, $response->getStatusCode());
             $tokens[] = $response->getHeader('X-Set-Auth-Token')->getValueLine();
         }
-        $this->assertTrue($tokens[0] !== $token[1]);
+        $this->assertNotSame($token[1], $tokens[0]);
     }
 }

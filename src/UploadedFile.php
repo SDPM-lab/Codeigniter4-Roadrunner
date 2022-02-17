@@ -19,17 +19,13 @@ class UploadedFile implements UploadedFileInterface
 
     /**
      * PHP uploaderror code
-     *
-     * @var int
      */
-    private $error;
+    private int $error;
 
     /**
      * Whether the file has been moved already or not.
-     *
-     * @var bool
      */
-    protected $hasMoved = false;
+    protected bool $hasMoved = false;
 
     protected $stream;
 
@@ -94,7 +90,7 @@ class UploadedFile implements UploadedFileInterface
      */
     public function moveTo($targetPath)
     {
-        $path = $this->setPath($targetPath); //set the target path
+        $this->setPath($targetPath); //set the target path
 
         if ($this->hasMoved) {
             throw HTTPException::forAlreadyMoved();

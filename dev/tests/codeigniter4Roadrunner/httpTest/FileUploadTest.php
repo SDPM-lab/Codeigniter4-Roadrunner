@@ -1,13 +1,15 @@
 <?php
 
+use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
 /**
  * @internal
  */
-final class FileUploadTest extends \CodeIgniter\Test\CIUnitTestCase
+final class FileUploadTest extends CIUnitTestCase
 {
     public function testFileUpload()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $dir      = __DIR__ . DIRECTORY_SEPARATOR . 'testFiles' . DIRECTORY_SEPARATOR;
@@ -15,11 +17,11 @@ final class FileUploadTest extends \CodeIgniter\Test\CIUnitTestCase
         $upload2  = $dir . 'upload2.text';
         $response = $client->post('/FileUploadTest/fileUpload', [
             'multipart' => [
-                'upload1' => new \CURLFile($upload1, 'text/plain', 'upload1.text'),
-                'upload2' => new \CURLFile($upload2, 'text/plain', 'upload2.text'),
+                'upload1' => new CURLFile($upload1, 'text/plain', 'upload1.text'),
+                'upload2' => new CURLFile($upload2, 'text/plain', 'upload2.text'),
             ],
         ]);
-        $this->assertTrue($response->getStatusCode() === 201);
+        $this->assertSame(201, $response->getStatusCode());
         $getServerMD5Text = json_decode($response->getBody(), true);
         $this->assertTrue(
             $getServerMD5Text['upload1.text'] === md5_file($upload1)
@@ -29,7 +31,7 @@ final class FileUploadTest extends \CodeIgniter\Test\CIUnitTestCase
 
     public function testFileMultipleUpload()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $dir      = __DIR__ . DIRECTORY_SEPARATOR . 'testFiles' . DIRECTORY_SEPARATOR;
@@ -37,11 +39,11 @@ final class FileUploadTest extends \CodeIgniter\Test\CIUnitTestCase
         $upload2  = $dir . 'upload2.text';
         $response = $client->post('/FileUploadTest/fileMultipleUpload', [
             'multipart' => [
-                'data[0]' => new \CURLFile($upload1, 'text/plain', 'upload1.text'),
-                'data[1]' => new \CURLFile($upload2, 'text/plain', 'upload2.text'),
+                'data[0]' => new CURLFile($upload1, 'text/plain', 'upload1.text'),
+                'data[1]' => new CURLFile($upload2, 'text/plain', 'upload2.text'),
             ],
         ]);
-        $this->assertTrue($response->getStatusCode() === 201);
+        $this->assertSame(201, $response->getStatusCode());
         $getServerMD5Text = json_decode($response->getBody(), true);
         $this->assertTrue(
             $getServerMD5Text['upload1.text'] === md5_file($upload1)

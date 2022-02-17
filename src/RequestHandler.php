@@ -2,6 +2,7 @@
 
 namespace SDPMlab\Ci4Roadrunner;
 
+use CodeIgniter\Config\Services;
 use Config\App;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -9,10 +10,8 @@ class RequestHandler
 {
     /**
      * RoadRunner Request
-     *
-     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    public static $_rRequest;
+    public static ServerRequestInterface $_rRequest;
 
     public static function initRequest(ServerRequestInterface $rRequest)
     {
@@ -21,50 +20,47 @@ class RequestHandler
 
         $_SERVER['HTTP_USER_AGENT'] = self::$_rRequest->getHeaderLine('User-Agent');
 
-        \CodeIgniter\Config\Services::request(new \Config\App(), false);
-        \CodeIgniter\Config\Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
+        Services::request(new App(), false);
+        Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
 
         UriBridge::setUri(self::$_rRequest->getUri());
 
         // $rRequest->g
-        \CodeIgniter\Config\Services::request()->setBody(self::getBody());
+        Services::request()->setBody(self::getBody());
 
         self::setParams();
         self::setHeader();
 
-        return \CodeIgniter\Config\Services::request();
+        return Services::request();
     }
 
     protected static function setFile()
     {
-        if (count(self::$_rRequest->getUploadedFiles()) > 0) {
+        if (self::$_rRequest->getUploadedFiles() !== []) {
             UploadedFileBridge::getPsr7UploadedFiles(self::$_rRequest->getUploadedFiles(), true);
         }
     }
 
     protected static function getBody()
     {
-        $body = '';
         if (strpos(self::$_rRequest->getHeaderLine('content-type'), 'application/json') === 0) {
-            $body = self::$_rRequest->getBody();
-        } else {
-            $body = self::$_rRequest->getBody()->getContents();
+            return self::$_rRequest->getBody();
         }
 
-        return $body;
+        return self::$_rRequest->getBody()->getContents();
     }
 
     protected static function setParams()
     {
-        \CodeIgniter\Config\Services::request()->setMethod(self::$_rRequest->getMethod());
-        \CodeIgniter\Config\Services::request()->setGlobal('get', self::$_rRequest->getQueryParams());
+        Services::request()->setMethod(self::$_rRequest->getMethod());
+        Services::request()->setGlobal('get', self::$_rRequest->getQueryParams());
 
         if (self::$_rRequest->getMethod() === 'POST') {
-            \CodeIgniter\Config\Services::request()->setGlobal('post', self::$_rRequest->getParsedBody());
+            Services::request()->setGlobal('post', self::$_rRequest->getParsedBody());
         }
 
         $_COOKIE = [];
-        \CodeIgniter\Config\Services::request()->setGlobal('cookie', self::$_rRequest->getCookieParams());
+        Services::request()->setGlobal('cookie', self::$_rRequest->getCookieParams());
 
         foreach (self::$_rRequest->getCookieParams() as $key => $value) {
             $_COOKIE[$key] = $value;
@@ -74,7 +70,7 @@ class RequestHandler
             session_id($_COOKIE[config(App::class)->sessionCookieName]);
         }
 
-        \CodeIgniter\Config\Services::request()->setGlobal('server', self::$_rRequest->getServerParams());
+        Services::request()->setGlobal('server', self::$_rRequest->getServerParams());
     }
 
     protected static function setHeader()
@@ -83,7 +79,7 @@ class RequestHandler
 
         foreach ($rHeader as $key => $datas) {
             foreach ($datas as $values) {
-                \CodeIgniter\Config\Services::request()->setHeader($key, $values);
+                Services::request()->setHeader($key, $values);
             }
         }
     }

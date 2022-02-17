@@ -1,15 +1,17 @@
 <?php
 
+use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
 /**
  * @internal
  */
-final class SessionTest extends \CodeIgniter\Test\CIUnitTestCase
+final class SessionTest extends CIUnitTestCase
 {
     public function testSession()
     {
         for ($i = 0; $i < 3; $i++) {
             //set session
-            $client = \Config\Services::curlrequest([
+            $client = Services::curlrequest([
                 'base_uri' => 'http://localhost:8080/',
             ], null, null, false);
             $checkText = uniqid();
@@ -19,7 +21,7 @@ final class SessionTest extends \CodeIgniter\Test\CIUnitTestCase
                 ],
                 'http_errors' => false,
             ]);
-            $this->assertTrue($response->getStatusCode() === 201);
+            $this->assertSame(201, $response->getStatusCode());
             //check session
             $setCookie = $response->getHeaders()['Set-Cookie']->getValue();
             $session   = explode('=', explode(';', $setCookie)[0]);
@@ -28,9 +30,9 @@ final class SessionTest extends \CodeIgniter\Test\CIUnitTestCase
                     'Cookie' => "{$session[0]}={$session[1]}",
                 ],
             ]);
-            $this->assertTrue($response->getStatusCode() === 200);
+            $this->assertSame(200, $response->getStatusCode());
             $getServerCheckText = json_decode($response->getBody(), true)['text'];
-            $this->assertTrue($getServerCheckText === $checkText);
+            $this->assertSame($checkText, $getServerCheckText);
         }
     }
 }

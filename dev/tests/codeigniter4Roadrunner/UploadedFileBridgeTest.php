@@ -2,13 +2,14 @@
 
 namespace SDPMlab\Ci4Roadrunner\Test;
 
+use CodeIgniter\Test\CIUnitTestCase;
 use SDPMlab\Ci4Roadrunner\UploadedFile;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
 
 /**
  * @internal
  */
-final class UploadedFileBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
+final class UploadedFileBridgeTest extends CIUnitTestCase
 {
     protected function setUp(): void
     {

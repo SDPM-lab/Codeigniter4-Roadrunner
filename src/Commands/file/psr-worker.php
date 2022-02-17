@@ -1,5 +1,15 @@
 <?php
 
+use Config\Paths;
+use Spiral\RoadRunner\Worker;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Spiral\RoadRunner\Http\PSR7Worker;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Response;
+use Kint\Kint;
+use Config\App;
+use CodeIgniter\CodeIgniter;
+use CodeIgniter\Config\Services;
 include 'vendor/autoload.php';
 
 use Nyholm\Psr7;
@@ -26,24 +36,24 @@ chdir(__DIR__);
 $pathsConfig = FCPATH . './app/Config/Paths.php';
 require realpath($pathsConfig) ?: $pathsConfig;
 
-$paths     = new Config\Paths();
+$paths     = new Paths();
 $bootstrap = rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
 $app       = require realpath($bootstrap) ?: $bootstrap;
 
 // roadrunner worker init
-$worker     = RoadRunner\Worker::create();
-$psrFactory = new Psr7\Factory\Psr17Factory();
-$psr7       = new RoadRunner\Http\PSR7Worker($worker, $psrFactory, $psrFactory, $psrFactory);
+$worker     = Worker::create();
+$psrFactory = new Psr17Factory();
+$psr7       = new PSR7Worker($worker, $psrFactory, $psrFactory, $psrFactory);
 
 while (true) {
     // get psr7 request
     try {
         $request = $psr7->waitRequest();
-        if (! ($request instanceof \Psr\Http\Message\ServerRequestInterface)) { // Termination request received
+        if (! ($request instanceof ServerRequestInterface)) { // Termination request received
             break;
         }
-    } catch (\Exception $e) {
-        $psr7->respond(new Psr7\Response(400)); // Bad Request
+    } catch (Exception $e) {
+        $psr7->respond(new Response(400)); // Bad Request
 
         continue;
     }
@@ -51,7 +61,7 @@ while (true) {
     // handle request object
     try {
         $ci4Request = RequestHandler::initRequest($request);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         var_dump((string) $e);
         $psr7->getWorker()->error((string) $e);
     }
@@ -59,7 +69,7 @@ while (true) {
     // handle debug-bar
     try {
         if (ENVIRONMENT === 'development') {
-            \Kint\Kint::$mode_default_cli = null;
+            Kint::$mode_default_cli = null;
             $toolbar                      = new Toolbar(config('Toolbar'), $ci4Request);
 
             if ($ci4BarResponse = $toolbar->respond()) {
@@ -71,7 +81,7 @@ while (true) {
                 continue;
             }
         }
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         $psr7->getWorker()->error((string) $e);
     }
 
@@ -81,14 +91,14 @@ while (true) {
             HandleDBConnection::reconnect();
         }
 
-        $appConfig = config(\Config\App::class);
-        $app       = new \CodeIgniter\CodeIgniter($appConfig);
+        $appConfig = config(App::class);
+        $app       = new CodeIgniter($appConfig);
         $app->initialize();
 
         $app->setRequest($ci4Request)->run();
 
-        $ci4Response = \CodeIgniter\Config\Services::response();
-    } catch (\Throwable $e) {
+        $ci4Response = Services::response();
+    } catch (Throwable $e) {
         $exception = new Exceptions($request);
         $response  = $exception->exceptionHandler($e);
         $psr7->respond($response);
@@ -106,8 +116,8 @@ while (true) {
 
         refreshCodeIgniter4();
         unset($app);
-    } catch (\Exception $e) {
-        $psr7->respond(new Psr7\Response(500, [], 'Something Went Wrong!'));
+    } catch (Exception $e) {
+        $psr7->respond(new Response(500, [], 'Something Went Wrong!'));
     }
 }
 
@@ -119,10 +129,10 @@ function refreshCodeIgniter4()
 
     try {
         ob_end_clean();
-    } catch (\Throwable $th) {
+    } catch (Throwable $th) {
     }
 
-    \CodeIgniter\Config\Services::reset(true);
+    Services::reset(true);
 
     UploadedFileBridge::reset();
 

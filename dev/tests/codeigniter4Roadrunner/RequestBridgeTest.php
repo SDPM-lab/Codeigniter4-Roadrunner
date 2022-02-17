@@ -2,6 +2,7 @@
 
 namespace SDPMlab\Ci4Roadrunner\Test;
 
+use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Config\Services;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -10,12 +11,12 @@ use SDPMlab\Ci4Roadrunner\RequestHandler;
 /**
  * @internal
  */
-final class RequestBridgeTest extends \CodeIgniter\Test\CIUnitTestCase
+final class RequestBridgeTest extends CIUnitTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        \CodeIgniter\Config\Services::reset(true);
+        Services::reset(true);
     }
 
     public function testNegotiatesLocale()
