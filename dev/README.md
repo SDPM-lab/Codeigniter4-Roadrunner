@@ -2,11 +2,11 @@
 
 This is the Codeigniter4-RoadRunner test case project, it is built by Codeigniter4, and has loaded the Codeigniter4-Roadrunner library class inside the upper directory included in the `src` in.
 
-You can run the test right after you modified the Codeigniter4-Roadrunner project files, verify if the funtions are complete; Or wirte some related program logic in this project to assist your development.
+You can run the test right after you modified the Codeigniter4-Roadrunner project files, verify if the functions are complete; Or write some related program logic in this project to assist your development.
 
 ## Test Range
 
-This test case takes the acutal sent CURL Request as test approach, because what Codeigniter4-Roadrunner provide is the synchronization on HTTP Request and Response objects of Roadrunner-Worker and Codeigniter4 (Since Codeigniter4 doesn't implement PSR-7 interface standard). In other words, we just have to verify if the server workes as what we wanted under the actual HTTP connection.
+This test case takes the actual sent CURL Request as test approach, because what Codeigniter4-Roadrunner provide is the synchronization on HTTP Request and Response objects of Roadrunner-Worker and Codeigniter4 (Since Codeigniter4 doesn't implement PSR-7 interface standard). In other words, we just have to verify if the server workes as what we wanted under the actual HTTP connection.
 
 1. BasicTest：Test HTTP `GET`、`POST`、`query`、`form-data`, and the `php echo` output command, and if `header` can process normally and give us outputs.
 2. FileUploadTest：Test if file upload class can work correctly and move files.
@@ -21,13 +21,13 @@ We recommend you to use the latest PHPUnit. While we're writing scripts, the ver
 composer install
 ```
 
-Next, you must initiallize the environment that Roadrunner needed.
+Next, you must initialize the environment that Roadrunner needed.
 
 ```
 php spark ciroad:init
 ```
 
-Finally, please confirm if the directory has these threee files including `rr`(if your developing under Windows, you will see `rr.exe`), `rr.yaml`, `psr-worker.php`.
+Finally, please confirm if the directory has these threee files including `rr` (if you are developing under Windows, you will see `rr.exe`), `rr.yaml`, `psr-worker.php`.
 
 ## Run Tests
 
@@ -49,7 +49,7 @@ http:
     num_workers: 1  
 ```
 
-Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to process. Hence we need to test the stability under the environment with only one worker to prove that it can work properly under several workers.
+Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to process. Hence, we need to test the stability under the environment with only one worker to prove that it can work properly under several workers.
 
 Next, you have to open a terminal and cd to the root directory, type the commands below to run the Roadrunner server:
 
