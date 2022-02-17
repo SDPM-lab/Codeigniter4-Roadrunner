@@ -1,5 +1,7 @@
 <?php
 
+include 'vendor/autoload.php';
+
 use CodeIgniter\CodeIgniter;
 use CodeIgniter\Config\Services;
 use Config\App;
@@ -10,9 +12,6 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use SDPMlab\Ci4Roadrunner\Debug\Exceptions;
-
-include 'vendor/autoload.php';
-
 use SDPMlab\Ci4Roadrunner\Debug\Toolbar;
 use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 use SDPMlab\Ci4Roadrunner\RequestHandler;
