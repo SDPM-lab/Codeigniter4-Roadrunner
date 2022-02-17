@@ -11,6 +11,7 @@ class UriBridge
     public static function setUri(UriInterface $rURI)
     {
         \CodeIgniter\Config\Services::uri(null, false);
+
         self::$_rURI = $rURI;
         self::transferPath();
         self::transferQuery();
@@ -27,6 +28,7 @@ class UriBridge
         }
 
         $pathArr = explode('/', $rPath);
+
         if ($pathArr[1] === 'index.php') {
             unset($pathArr[1]);
             array_values($pathArr);
@@ -35,6 +37,7 @@ class UriBridge
             unset($pathArr[count($pathArr) - 1]);
             array_values($pathArr);
         }
+
         $path = '/' . implode('/', $pathArr);
         \CodeIgniter\Config\Services::request()->setPath($path);
     }

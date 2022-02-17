@@ -106,7 +106,7 @@ class UploadedFileBridge
      * Given a file array, will create UploadedFile instances. Will
      * loop over an array and create objects for each.
      *
-     * @return array|UploadedFile
+     * @return array|ReplaceUploadedFile
      */
     protected function createFileObject(array $array)
     {

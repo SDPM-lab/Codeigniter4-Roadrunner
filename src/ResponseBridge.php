@@ -2,6 +2,7 @@
 
 namespace SDPMlab\Ci4Roadrunner;
 
+use Config\App;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Response\InjectContentTypeTrait;
 use Laminas\Diactoros\Stream;
@@ -19,6 +20,7 @@ class ResponseBridge extends Response
         ServerRequestInterface $rRequest
     ) {
         $this->_rRequest = $rRequest;
+
         parent::__construct(
             $this->createBody($ci4Response),
             $this->getCi4StatusCode($ci4Response),
@@ -42,6 +44,7 @@ class ResponseBridge extends Response
             $cookiesSessionID = $this->_rRequest->getCookieParams()[$sessionName] ?? '';
             $cookiesParams    = session_get_cookie_params();
             $config           = config(App::class);
+
             if ($cookiesSessionID === '') {
                 $cookieStr = $this->getCookieString(
                     $sessionName,
@@ -65,10 +68,12 @@ class ResponseBridge extends Response
                 );
                 $ci4Response->setHeader('Set-Cookie', $cookieStr);
             }
+
             unset($_SESSION);
             session_write_close();
             session_id(null);
         }
+
         $ci4headers = $ci4Response->headers();
         $headers    = [];
 
@@ -86,6 +91,7 @@ class ResponseBridge extends Response
     {
         $str = urlencode($name) . '=';
         $str .= urlencode($value);
+
         if ($expire !== 0) {
             $str .= '; Expires=' . gmdate('D, d-M-Y H:i:s T', $expire);
         }

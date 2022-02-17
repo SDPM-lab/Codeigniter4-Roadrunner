@@ -2,6 +2,7 @@
 
 namespace SDPMlab\Ci4Roadrunner;
 
+use Config\App;
 use Psr\Http\Message\ServerRequestInterface;
 
 class RequestHandler
@@ -9,7 +10,7 @@ class RequestHandler
     /**
      * RoadRunner Request
      *
-     * @var Psr\Http\Message\ServerRequestInterface
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
     public static $_rRequest;
 
@@ -17,12 +18,17 @@ class RequestHandler
     {
         self::$_rRequest = $rRequest;
         self::setFile();
+
         $_SERVER['HTTP_USER_AGENT'] = self::$_rRequest->getHeaderLine('User-Agent');
+
         \CodeIgniter\Config\Services::request(new \Config\App(), false);
         \CodeIgniter\Config\Services::request()->getUserAgent()->parse($_SERVER['HTTP_USER_AGENT']);
+
         UriBridge::setUri(self::$_rRequest->getUri());
+
         // $rRequest->g
         \CodeIgniter\Config\Services::request()->setBody(self::getBody());
+
         self::setParams();
         self::setHeader();
 
@@ -52,18 +58,22 @@ class RequestHandler
     {
         \CodeIgniter\Config\Services::request()->setMethod(self::$_rRequest->getMethod());
         \CodeIgniter\Config\Services::request()->setGlobal('get', self::$_rRequest->getQueryParams());
+
         if (self::$_rRequest->getMethod() === 'POST') {
             \CodeIgniter\Config\Services::request()->setGlobal('post', self::$_rRequest->getParsedBody());
         }
+
         $_COOKIE = [];
         \CodeIgniter\Config\Services::request()->setGlobal('cookie', self::$_rRequest->getCookieParams());
 
         foreach (self::$_rRequest->getCookieParams() as $key => $value) {
             $_COOKIE[$key] = $value;
         }
+
         if (isset($_COOKIE[config(App::class)->sessionCookieName])) {
             session_id($_COOKIE[config(App::class)->sessionCookieName]);
         }
+
         \CodeIgniter\Config\Services::request()->setGlobal('server', self::$_rRequest->getServerParams());
     }
 
