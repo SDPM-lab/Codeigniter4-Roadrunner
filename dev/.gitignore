@@ -125,6 +125,7 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
+rr
 rr.exe
 .rr.yaml
 psr-worker.php
