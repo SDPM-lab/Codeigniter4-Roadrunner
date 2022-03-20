@@ -15,7 +15,7 @@ This test case takes the actual sent CURL Request as test approach, because what
 
 ## Requirements
 
-We recommend you to use the latest PHPUnit. While we're writing scripts, the version we're running at is version `9.5.10`. You might need to use Composer to download the library your project needed back to your develop environment.
+We recommend you to use the latest PHPUnit. While we're writing scripts, the version we're running at is version `9.5.19`. You might need to use Composer to download the library your project needed back to your develop environment.
 
 ```
 composer install
@@ -27,11 +27,11 @@ Next, you must initialize the environment that Roadrunner needed.
 php spark ciroad:init
 ```
 
-Finally, please confirm if the directory has these threee files including `rr` (if you are developing under Windows, you will see `rr.exe`), `rr.yaml`, `psr-worker.php`.
+Finally, please confirm if the directory has these three files including `rr` (if you are developing under Windows, you will see `rr.exe`), `.rr.yaml`, `psr-worker.php`.
 
 ## Run Tests
 
-Before running tests, please open `rr.yaml` file first, and ensure this configuration file has these settings:
+Before running tests, please open `.rr.yaml` file first, and ensure this configuration file has these settings:
 
 ```yaml
 rpc:
@@ -54,7 +54,7 @@ Since Roadrunner-Worker lasts inside RAMs, HTTP requests will reuse Workers to p
 Next, you have to open a terminal and cd to the root directory, type the commands below to run the Roadrunner server:
 
 ```
-rr serve -d
+./rr serve -d
 ```
 
 Finally, open another new terminal and cd to the test project, type the commands below to run tests:
