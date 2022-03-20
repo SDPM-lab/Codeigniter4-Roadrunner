@@ -13,7 +13,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ## Install
 
 ### Prerequisites
-1. CodeIgniter Framework 4.1.5^
+1. CodeIgniter Framework 4.1.9^
 2. Composer
 3. Enable `php-curl` extension
 4. Enable `php-zip` extension
@@ -44,6 +44,8 @@ Run the command in the root directory of your project:
 ## Server Settings
 The server settings are all in the project root directory ".rr.yaml". The default file will look like this:
 ```yaml
+version: "2.7"
+
 rpc:
   listen: tcp://127.0.0.1:6001
 
@@ -121,8 +123,8 @@ class Home extends BaseController
 
   public function index()
   {
-    //Don't use :
-    //echo view('welcome_message');
+    // Don't use:
+    // echo view('welcome_message');
     return view('welcome_message');
   }
 
