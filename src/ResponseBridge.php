@@ -2,11 +2,12 @@
 
 namespace SDPMlab\Ci4Roadrunner;
 
+use Config\App;
 use Laminas\Diactoros\Response;
-use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\Response\InjectContentTypeTrait;
-use Psr\Http\Message\StreamInterface;
+use Laminas\Diactoros\Stream;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 
 class ResponseBridge extends Response
 {
@@ -19,6 +20,7 @@ class ResponseBridge extends Response
         ServerRequestInterface $rRequest
     ) {
         $this->_rRequest = $rRequest;
+
         parent::__construct(
             $this->createBody($ci4Response),
             $this->getCi4StatusCode($ci4Response),
@@ -31,50 +33,57 @@ class ResponseBridge extends Response
 
     private function getCi4ContentType(\CodeIgniter\HTTP\Response $ci4Response): string
     {
-        return  $ci4Response->getHeaderLine("Content-Type");
+        return $ci4Response->getHeaderLine('Content-Type');
     }
 
     private function getCi4Headers(\CodeIgniter\HTTP\Response $ci4Response): array
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
-            $sessionID = session_id();
-            $sessionName = session_name();
-            $cookiesSessionID = $this->_rRequest->getCookieParams()[$sessionName] ?? "";
-            $cookiesParams = session_get_cookie_params();
-            $config = config(App::class);
-            if ($cookiesSessionID == "") {
+            $sessionID        = session_id();
+            $sessionName      = session_name();
+            $cookiesSessionID = $this->_rRequest->getCookieParams()[$sessionName] ?? '';
+            $cookiesParams    = session_get_cookie_params();
+            $config           = config(App::class);
+
+            if ($cookiesSessionID === '') {
                 $cookieStr = $this->getCookieString(
                     $sessionName,
                     $sessionID,
-                    (time() + $cookiesParams["lifetime"]),
-                    $cookiesParams["path"],
-                    $cookiesParams["domain"],
-                    $cookiesParams["secure"],
-                    $cookiesParams["httponly"]
+                    (time() + $cookiesParams['lifetime']),
+                    $cookiesParams['path'],
+                    $cookiesParams['domain'],
+                    $cookiesParams['secure'],
+                    $cookiesParams['httponly']
                 );
-                $ci4Response->setHeader("Set-Cookie", $cookieStr);
-            } else if ($cookiesSessionID != $sessionID) {
+                $ci4Response->setHeader('Set-Cookie', $cookieStr);
+            } elseif ($cookiesSessionID !== $sessionID) {
                 $cookieStr = $this->getCookieString(
                     $sessionName,
-                    "",
+                    '',
                     time(),
                     $config->cookiePath,
                     $config->cookieDomain,
                     $config->cookieSecure,
                     $config->cookieHTTPOnly
                 );
-                $ci4Response->setHeader("Set-Cookie", $cookieStr);
+                $ci4Response->setHeader('Set-Cookie', $cookieStr);
             }
+
             unset($_SESSION);
             session_write_close();
             session_id(null);
         }
+
         $ci4headers = $ci4Response->headers();
-        $headers = [];
+        $headers    = [];
+
         foreach ($ci4headers as $key => $value) {
-            if ($key == "Content-Type") continue;
+            if ($key === 'Content-Type') {
+                continue;
+            }
             $headers[$key] = $value->getValueLine();
         }
+
         return $headers;
     }
 
@@ -82,13 +91,23 @@ class ResponseBridge extends Response
     {
         $str = urlencode($name) . '=';
         $str .= urlencode($value);
+
         if ($expire !== 0) {
             $str .= '; Expires=' . gmdate('D, d-M-Y H:i:s T', $expire);
         }
-        if ($path) $str .= '; Path=' . $path;
-        if ($domain) $str .= '; Domain=' . $domain;
-        if (true === $secure) $str .= '; Secure';
-        if (true === $httpOnly) $str .= '; HttpOnly';
+        if ($path) {
+            $str .= '; Path=' . $path;
+        }
+        if ($domain) {
+            $str .= '; Domain=' . $domain;
+        }
+        if (true === $secure) {
+            $str .= '; Secure';
+        }
+        if (true === $httpOnly) {
+            $str .= '; HttpOnly';
+        }
+
         return $str;
     }
 
@@ -96,6 +115,7 @@ class ResponseBridge extends Response
     {
         $cookies = [];
         $headers = headers_list();
+
         foreach ($headers as $header) {
             if (strpos($header, 'Set-Cookie: ') === 0) {
                 $value = str_replace('&', urlencode('&'), substr($header, 12));
@@ -103,6 +123,7 @@ class ResponseBridge extends Response
                 $cookies = array_merge_recursive($cookies, $pair);
             }
         }
+
         return $cookies[$name] ?? false;
     }
 
@@ -120,6 +141,7 @@ class ResponseBridge extends Response
         $body = new Stream('php://temp', 'wb+');
         $body->write($html);
         $body->rewind();
+
         return $body;
     }
 }

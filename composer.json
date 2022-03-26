@@ -18,10 +18,11 @@
             "homepage": "https://github.com/SDPM-lab"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "php" : "^7.3",
-        "codeigniter4/framework": "^4.1.5",
+        "php" : "^7.4 || ^8.0",
+        "codeigniter4/framework": "^4.1.9",
         "spiral/roadrunner": "^2",
         "spiral/dumper": "^2.8",
         "laminas/laminas-diactoros": "^2.8",
@@ -31,5 +32,14 @@
 		"psr-4": {
 			"SDPMlab\\Ci4Roadrunner\\": "src/"
 		}
-	}
+	},
+    "require-dev": {
+        "codeigniter4/devkit": "^1.0",
+        "rector/rector": "0.12.16"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
 }

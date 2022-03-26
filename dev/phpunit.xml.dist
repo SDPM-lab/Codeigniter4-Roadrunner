@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		bootstrap="vendor/codeigniter4/framework/system/Test/bootstrap.php"
+		bootstrap="tests/bootstrap.php"
 		backupGlobals="false"
 		colors="true"
 		convertErrorsToExceptions="true"
@@ -19,7 +19,7 @@
 			<directory suffix=".php">./app</directory>
 			<directory suffix=".php">./app/Views</directory>
 			<file>./app/Config/Routes.php</file>
-			<file>../src/Commands\file\psr-worker.php</file>
+			<file>../src/Commands/file/psr-worker.php</file>
 		</exclude>
 		<report>
 			<clover outputFile="build/logs/clover.xml"/>
