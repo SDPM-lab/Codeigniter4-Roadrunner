@@ -8,7 +8,7 @@
 
 Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response object between Roadrunner-Worker and Codeigniter4. Since Codeigniter4 doesn't implement  [PSR-7 standard](https://codeigniter.tw/user_guide/intro/psr.html) completely, you need to use this library to allow your Codeigniter4 project to run using RoadRunner Server.
 
-[正體中文說明書](https://github.com/SDPM-lab/Codeigniter4-Roadrunner/blob/dev/README_zh-TW.md)
+[正體中文說明書](README_zh-TW.md)
 
 ## Install
 
