@@ -21,8 +21,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php" : "^7.3",
-        "codeigniter4/framework": "^4.1.5",
+        "php" : "^7.4 || ^8.0",
+        "codeigniter4/framework": "^4.1.9",
         "spiral/roadrunner": "^2",
         "spiral/dumper": "^2.8",
         "laminas/laminas-diactoros": "^2.8",

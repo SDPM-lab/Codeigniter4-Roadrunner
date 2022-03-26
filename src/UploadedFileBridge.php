@@ -13,10 +13,8 @@ class UploadedFileBridge
 
     /**
      * PSR-7 UploadedFile Object Array
-     *
-     * @var array
      */
-    private $_psrFiles = [];
+    private array $_psrFiles = [];
 
     public function __construct(
         array $files = [],
@@ -106,7 +104,7 @@ class UploadedFileBridge
      * Given a file array, will create UploadedFile instances. Will
      * loop over an array and create objects for each.
      *
-     * @return array|UploadedFile
+     * @return array|ReplaceUploadedFile
      */
     protected function createFileObject(array $array)
     {

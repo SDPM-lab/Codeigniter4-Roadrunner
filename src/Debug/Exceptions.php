@@ -3,7 +3,10 @@
 namespace SDPMlab\Ci4Roadrunner\Debug;
 
 use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\Config\Services;
 use CodeIgniter\Exceptions\PageNotFoundException;
+use CodeIgniter\HTTP\IncomingRequest;
+use CodeIgniter\HTTP\Response;
 use Config\Paths;
 use ErrorException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,18 +22,14 @@ class Exceptions
 
     /**
      * Nesting level of the output buffering mechanism
-     *
-     * @var int
      */
-    public $ob_level;
+    public int $ob_level;
 
     /**
      * The path to the directory containing the
      * cli and html error view directories.
-     *
-     * @var string
      */
-    protected $viewPath;
+    protected string $viewPath;
 
     /**
      * Config for debug exceptions.
@@ -42,23 +41,21 @@ class Exceptions
     /**
      * The incoming request.
      *
-     * @var \CodeIgniter\HTTP\IncomingRequest
+     * @var IncomingRequest
      */
     protected $request;
 
     /**
      * The outgoing response.
      *
-     * @var \CodeIgniter\HTTP\Response
+     * @var Response
      */
     protected $response;
 
     /**
      * Roadrunner Request
-     *
-     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    protected $rRequest;
+    protected ServerRequestInterface $rRequest;
 
     /**
      * Roadrunner Client
@@ -68,13 +65,12 @@ class Exceptions
     protected $client;
 
     //--------------------------------------------------------------------
-
     /**
      * Constructor.
      *
-     * @param \Config\Exceptions                $config
-     * @param \CodeIgniter\HTTP\IncomingRequest $request
-     * @param \CodeIgniter\HTTP\Response        $response
+     * @param \Config\Exceptions $config
+     * @param IncomingRequest    $request
+     * @param Response           $response
      */
     public function __construct(
         ServerRequestInterface $rRequest
@@ -82,8 +78,8 @@ class Exceptions
         $this->config   = new \Config\Exceptions();
         $this->ob_level = ob_get_level();
         $this->viewPath = rtrim($this->config->errorViewPath, '/ ') . '/';
-        $this->request  = \CodeIgniter\Config\Services::request();
-        $this->response = \CodeIgniter\Config\Services::response();
+        $this->request  = Services::request();
+        $this->response = Services::response();
         $this->rRequest = &$rRequest;
     }
 
@@ -202,9 +198,8 @@ class Exceptions
         $buffer = ob_get_contents();
         ob_end_clean();
         $this->response->setBody($buffer);
-        $response = new ResponseBridge($this->response->send(), $this->rRequest);
 
-        return $response;
+        return new ResponseBridge($this->response->send(), $this->rRequest);
     }
 
     //--------------------------------------------------------------------
@@ -294,11 +289,11 @@ class Exceptions
         if ($bytes < 1024) {
             return $bytes . 'B';
         }
-        if ($bytes < 1048576) {
+        if ($bytes < 1_048_576) {
             return round($bytes / 1024, 2) . 'KB';
         }
 
-        return round($bytes / 1048576, 2) . 'MB';
+        return round($bytes / 1_048_576, 2) . 'MB';
     }
 
     //--------------------------------------------------------------------

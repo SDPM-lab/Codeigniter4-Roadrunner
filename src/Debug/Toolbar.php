@@ -37,32 +37,26 @@ class Toolbar
 {
     /**
      * Toolbar configuration settings.
-     *
-     * @var ToolbarConfig
      */
-    protected $config;
+    protected ToolbarConfig $config;
 
     /**
      * Collectors to be used and displayed.
      *
      * @var BaseCollector[]
      */
-    protected $collectors = [];
+    protected array $collectors = [];
 
     /**
      * The incoming request.
-     *
-     * @var \CodeIgniter\HTTP\IncomingRequest
      */
-    protected $request;
-    //--------------------------------------------------------------------
+    protected IncomingRequest $request;
 
+    //--------------------------------------------------------------------
     /**
      * The outgoing response.
-     *
-     * @var \CodeIgniter\HTTP\Response
      */
-    protected $response;
+    protected Response $response;
 
     public function __construct(
         ToolbarConfig $config,
@@ -486,7 +480,7 @@ class Toolbar
 
     private function getResponse(string $body, int $code, string $contentType)
     {
-        $response = \Config\Services::response();
+        $response = Services::response();
         $response->setBody($body)->setStatusCode($code)->setHeader('Content-Type', $contentType);
 
         return $response;

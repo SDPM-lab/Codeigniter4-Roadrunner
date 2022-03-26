@@ -19,7 +19,7 @@
 			<directory suffix=".php">./app</directory>
 			<directory suffix=".php">./app/Views</directory>
 			<file>./app/Config/Routes.php</file>
-			<file>../src/Commands\file\psr-worker.php</file>
+			<file>../src/Commands/file/psr-worker.php</file>
 		</exclude>
 		<report>
 			<clover outputFile="build/logs/clover.xml"/>

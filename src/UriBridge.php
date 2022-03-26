@@ -2,6 +2,7 @@
 
 namespace SDPMlab\Ci4Roadrunner;
 
+use CodeIgniter\Config\Services;
 use Psr\Http\Message\UriInterface;
 
 class UriBridge
@@ -10,7 +11,8 @@ class UriBridge
 
     public static function setUri(UriInterface $rURI)
     {
-        \CodeIgniter\Config\Services::uri(null, false);
+        Services::uri(null, false);
+
         self::$_rURI = $rURI;
         self::transferPath();
         self::transferQuery();
@@ -21,12 +23,13 @@ class UriBridge
         $rPath = self::$_rURI->getPath();
 
         if ($rPath === '/') {
-            \CodeIgniter\Config\Services::request()->setPath($rPath);
+            Services::request()->setPath($rPath);
 
             return;
         }
 
         $pathArr = explode('/', $rPath);
+
         if ($pathArr[1] === 'index.php') {
             unset($pathArr[1]);
             array_values($pathArr);
@@ -35,12 +38,13 @@ class UriBridge
             unset($pathArr[count($pathArr) - 1]);
             array_values($pathArr);
         }
+
         $path = '/' . implode('/', $pathArr);
-        \CodeIgniter\Config\Services::request()->setPath($path);
+        Services::request()->setPath($path);
     }
 
     protected static function transferQuery()
     {
-        \CodeIgniter\Config\Services::uri()->setQuery(self::$_rURI->getQuery());
+        Services::uri()->setQuery(self::$_rURI->getQuery());
     }
 }

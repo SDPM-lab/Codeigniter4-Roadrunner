@@ -1,34 +1,37 @@
 <?php
 
+use CodeIgniter\Test\CIUnitTestCase;
+use Config\Services;
+
 /**
  * @internal
  */
-final class RestTest extends \CodeIgniter\Test\CIUnitTestCase
+final class RestTest extends CIUnitTestCase
 {
     public function testList()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $response = $client->get('/testRest');
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertSame(200, $response->getStatusCode());
     }
 
     public function testShow()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $id       = uniqid();
         $response = $client->get("/testRest/{$id}");
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertSame(200, $response->getStatusCode());
         $getJson = json_decode($response->getBody(), true);
-        $this->assertTrue($getJson['id'] === $id);
+        $this->assertSame($id, $getJson['id']);
     }
 
     public function testCreate()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $text1    = uniqid();
@@ -41,15 +44,15 @@ final class RestTest extends \CodeIgniter\Test\CIUnitTestCase
                 'text2' => $text2,
             ],
         ]);
-        $this->assertTrue($response->getStatusCode() === 201);
+        $this->assertSame(201, $response->getStatusCode());
         $getJson   = json_decode($response->getBody(), true);
         $resVerify = md5($getJson['data']['text1'] . $getJson['data']['text2']);
-        $this->assertTrue($resVerify === $verify);
+        $this->assertSame($verify, $resVerify);
     }
 
     public function testUpdate()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $text1    = uniqid();
@@ -63,43 +66,43 @@ final class RestTest extends \CodeIgniter\Test\CIUnitTestCase
                 'text2' => $text2,
             ],
         ]);
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertSame(200, $response->getStatusCode());
         $getJson   = json_decode($response->getBody(), true);
         $resVerify = md5($getJson['data']['text1'] . $getJson['data']['text2']);
-        $this->assertTrue($resVerify === $verify);
-        $this->assertTrue($getJson['id'] === $id);
+        $this->assertSame($verify, $resVerify);
+        $this->assertSame($id, $getJson['id']);
     }
 
     public function testNew()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $response = $client->get('/testRest/new');
-        $this->assertTrue($response->getStatusCode() === 200);
-        $this->assertTrue($response->getBody() === 'newView');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('newView', $response->getBody());
     }
 
     public function testEdit()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $id       = uniqid();
         $response = $client->get("/testRest/{$id}/edit");
-        $this->assertTrue($response->getStatusCode() === 200);
-        $this->assertTrue($response->getBody() === $id . 'editView');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame($id . 'editView', $response->getBody());
     }
 
     public function testDelete()
     {
-        $client = \Config\Services::curlrequest([
+        $client = Services::curlrequest([
             'base_uri' => 'http://localhost:8080/',
         ], null, null, false);
         $id       = uniqid();
         $response = $client->delete("/testRest/{$id}");
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertSame(200, $response->getStatusCode());
         $getJson = json_decode($response->getBody(), true);
-        $this->assertTrue($getJson['id'] === $id);
+        $this->assertSame($id, $getJson['id']);
     }
 }
