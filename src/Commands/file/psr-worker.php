@@ -2,12 +2,9 @@
 
 include 'vendor/autoload.php';
 
-use CodeIgniter\CodeIgniter;
 use CodeIgniter\Config\Services;
-use Config\App;
 use Config\Paths;
 use Kint\Kint;
-use Nyholm\Psr7;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,7 +14,6 @@ use SDPMlab\Ci4Roadrunner\HandleDBConnection;
 use SDPMlab\Ci4Roadrunner\RequestHandler;
 use SDPMlab\Ci4Roadrunner\ResponseBridge;
 use SDPMlab\Ci4Roadrunner\UploadedFileBridge;
-use Spiral\RoadRunner;
 use Spiral\RoadRunner\Http\PSR7Worker;
 use Spiral\RoadRunner\Worker;
 
@@ -30,17 +26,30 @@ if (! function_exists('is_cli')) {
     }
 }
 
+/**
+ * Ci4 4.2.0 init
+ */
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
-chdir(__DIR__);
+chdir(FCPATH);
 
 $pathsConfig = FCPATH . './app/Config/Paths.php';
 require realpath($pathsConfig) ?: $pathsConfig;
 
-$paths     = new Paths();
-$bootstrap = rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
-$app       = require realpath($bootstrap) ?: $bootstrap;
+$paths = new Paths();
 
-// roadrunner worker init
+$botstorap = rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require realpath($botstorap);
+
+require_once SYSTEMPATH . 'Config/DotEnv.php';
+(new \CodeIgniter\Config\DotEnv(ROOTPATH))->load();
+
+$app = \Config\Services::codeigniter();
+$app->initialize();
+$app->setContext('web');
+
+/**
+ * RoadRunner worker init
+ */
 $worker     = Worker::create();
 $psrFactory = new Psr17Factory();
 $psr7       = new PSR7Worker($worker, $psrFactory, $psrFactory, $psrFactory);
@@ -91,11 +100,9 @@ while (true) {
             HandleDBConnection::reconnect();
         }
 
-        $appConfig = config(App::class);
-        $app       = new CodeIgniter($appConfig);
+        $app = \Config\Services::codeigniter();
         $app->initialize();
-
-        $app->setRequest($ci4Request)->run();
+        $app->setContext('web')->setRequest($ci4Request)->run();
 
         $ci4Response = Services::response();
     } catch (Throwable $e) {
