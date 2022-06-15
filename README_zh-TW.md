@@ -11,7 +11,7 @@ Codeigniter4-RoadRunner 提供的是 Roadrunner-Worker 與 Codeigniter4 在 Requ
 ## 安裝
 
 ### 需求
-1. CodeIgniter Framework 4.1.9 以上
+1. CodeIgniter Framework 4.2.0 以上
 2. Composer
 3. 安裝並開啟 php-curl 擴充套件
 4. 安裝並開啟 php-zip 擴充套件
@@ -155,12 +155,14 @@ class Home extends BaseController
 
 ```yaml
 http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    pool:
-      numWorkers: 1
-      # maxJobs:  500
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
 ```
 
 ### 資料庫連線

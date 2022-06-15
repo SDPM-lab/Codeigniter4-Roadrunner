@@ -22,7 +22,7 @@
     "prefer-stable": true,
     "require": {
         "php" : "^7.4 || ^8.0",
-        "codeigniter4/framework": "^4.1.9",
+        "codeigniter4/framework": "^4.2.0",
         "spiral/roadrunner": "^2",
         "spiral/dumper": "^2.8",
         "laminas/laminas-diactoros": "^2.8",
@@ -39,7 +39,8 @@
     },
     "config": {
         "allow-plugins": {
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "composer/package-versions-deprecated": true
         }
     }
 }
