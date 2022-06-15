@@ -13,7 +13,7 @@ Codeigniter4-RoadRunner provides the synchroniztion of the Request and Response 
 ## Install
 
 ### Prerequisites
-1. CodeIgniter Framework 4.1.9^
+1. CodeIgniter Framework 4.2.0^
 2. Composer
 3. Enable `php-curl` extension
 4. Enable `php-zip` extension
@@ -152,12 +152,14 @@ You can reference the `.rr.yaml` settings below to lower the amount of Worker to
 
 ```yaml
 http:
-  address:         0.0.0.0:8080
-  workers:
-    command:  "php psr-worker.php"
-    pool:
-      numWorkers: 1
-      # maxJobs:  500
+  address: "0.0.0.0:8080"
+  static:
+    dir: "./public"
+    forbid: [".htaccess", ".php"]
+  pool:
+    num_workers: 1
+    # max_jobs: 64
+    # debug: true
 ```
 
 ### Database Connection
